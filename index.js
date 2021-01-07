@@ -23,8 +23,7 @@ function getJSON(url) {
 }
 const offsets = getJSON("https://raw.githubusercontent.com/frk1/hazedumper/master/csgo.json");
 
-let processObject, handle, client, engine, vstdlib;
-
+let processObject, handle, client, engine, vstdlib, currentTag;
 let local = {
     getLocal: () => memoryjs.readMemory(handle, client + offsets.signatures.dwLocalPlayer, memoryjs.INT),
     getInCross: () => memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_iCrosshairId, memoryjs.INT),
@@ -108,6 +107,7 @@ let recoil = setInterval( () => {
             OldAimPunch.y = vPunch.y * 2;
 
             local.setViewAngles(NewViewAngles)
+
         }
         else
         {
@@ -187,21 +187,41 @@ function init() {
     });
 }
 
-let menu = setInterval( () => {
-    if (processObject != undefined && document.getElementById("radarBox").checked){
-        for (var i = 1; i < 65; i++){
-            memoryjs.writeMemory(handle, entity.getEntity(i - 1) + offsets.netvars.m_bSpotted, 1, "int");
-        }
-    }
-}, 50)
-
 window.addEventListener('DOMContentLoaded', () => {
     init();
 })
 
+let scrollTag = () => {
+    let originalTag = document.getElementById('tagbox').value
+    let currentTag = originalTag
+    return setInterval(() => {
+        let z = currentTag.substring(1)
+        currentTag = z + currentTag.charAt(0)
+        setClanTag(currentTag)
+    }, 500);
+} 
+
+let setClanTagButton = () => {
+    if (document.getElementById('staticTagBox').checked){
+        setClanTag(document.getElementById('tagbox').value)
+    } 
+    if (document.getElementById('scrollTagBox').checked){
+        let originalTag = document.getElementById('tagbox').value
+        let currentTag = originalTag
+        tag = () => {
+            if (document.getElementById('scrollTagBox').checked){
+                let z = currentTag.substring(1)
+                currentTag = z + currentTag.charAt(0)
+                setClanTag(currentTag)
+                setTimeout(tag, 600)
+            }
+        }
+        tag()
+    } 
+}
 
 let setClanTag = (tag) => {
-    lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, tag)
+    lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, " " + tag)
     console.log(`Set tag to ${tag}`)
 }
 

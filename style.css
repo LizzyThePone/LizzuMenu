@@ -12,14 +12,33 @@ body {
     padding-top: 10px;
 }
 
+input[type="radio"]{
+  display: none;
+}
+input[type="radio"] + label span {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background: transparent;
+  vertical-align: middle;
+  border: 2px solid #7289DA;
+  border-radius: 50%;
+  padding: 2px;
+  margin:0 5px;
+}
+input[type="radio"]:checked + label span {
+  width: 15px;
+  height: 15px;
+  background: #7289DA;
+  background-clip: content-box;
+}
 form.tagbox input[type=text] {
   padding: 10px;
   font-size: 17px;
-  border: 1px solid grey;
+  border: 1px solid black;
   float: left;
   width: 80%;
   background: #f1f1f1;
-  border-radius: 10px;
 }
 * {
   box-sizing: border-box;
@@ -28,18 +47,19 @@ form.tagbox input[type=text] {
 form.tagbox button {
   float: left;
   width: 20%;
+  height: 40px;
   padding: 10px;
-  background: #2196F3;
+  background:  #7289DA;
+  margin-top: 1px;
   color: white;
   font-size: 17px;
   border: 1px solid grey;
   border-left: none;
   cursor: pointer;
-  border-radius: 10px;
 }
 
 form.tagbox button:hover {
-  background: #0b7dda;
+  background:  #7FA0E8;
 }
 
 form.tagbox::after {

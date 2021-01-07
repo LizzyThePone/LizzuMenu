@@ -5,6 +5,7 @@
     <title>Loading...</title>
     <link rel="stylesheet" type="text/css" href="./style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <script src="index.js"></script>
   </head>
   <body>
@@ -36,12 +37,19 @@
         <input id="recoilBox" name="recoilBox" type="checkbox">
         <span class="checkmark"></span>
     </label>
-    <form class="tagbox" style="max-width:300px">
-        Clantag Changer
+    <form class="tagbox" style="max-width:300px" onsubmit="return false;">
+        <h3>Clantag Changer:</h3>
         <input type="text" id="tagbox" placeholder="ClanTag" name="set">
-        <button type="submit" onclick="setClanTag(document.getElementById('tagbox').value)">Set</button>
+        <button onclick="setClanTagButton()">Set</button>
     </form>
-    
+    <br>
+    <div>
+        <input id="staticTagBox" type="radio" name="user" value="Static" checked="true">
+        <label for="staticTagBox"><span></span>Static</label>
+
+        <input id="scrollTagBox" type="radio" name="user" value="Scroll">
+        <label for="scrollTagBox"><span></span>Scroll</label>
+    </div>
     <!-- You can also require other files to run in this process -->
     <!--script src="./renderer.js"></script-->
   </body>
