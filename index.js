@@ -202,6 +202,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 let setClanTag = (tag) => {
     lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, tag)
+    console.log(`Set tag to ${tag}`)
 }
 
 let getcvar = (str) => {

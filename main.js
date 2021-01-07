@@ -7,7 +7,7 @@ function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 500,
     height: 600,
-    resizable: false,
+    //resizable: false,
     titleBarStyle: 'hidden',
     backgroundColor: "#191b1c",
     webPreferences: {
