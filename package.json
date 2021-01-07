@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "asynckeystate": "^0.0.5",
+    "electron-squirrel-startup": "^1.0.0",
+    "memoryjs": "github:Rob--/memoryjs",
+    "node-addon-api": "^3.1.0"
+  },
+  "main": "src/main.js",
+  "scripts": {
+    "run": "electron src/main",
+    "build": "npm rebuild | node-gyp build"
+  }
+}
