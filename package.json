@@ -8,6 +8,6 @@
   "main": "src/main.js",
   "scripts": {
     "run": "electron src/main",
-    "build": "npm rebuild | node-gyp build"
+    "build": "npm rebuild; node-gyp build"
   }
 }

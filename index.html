@@ -5,51 +5,74 @@
     <title>Loading...</title>
     <link rel="stylesheet" type="text/css" href="./style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
     <script src="index.js"></script>
   </head>
   <body>
-    <label class="container">Bunny Hop
-        <input id="bhopBox" name="bhopBox" type="checkbox">
-        <span class="checkmark"></span>
-    </label>
-    <label class="container">Autostrafe
-        <input id="autostrafeBox" name="autostrafeBox" type="checkbox">
-        <span class="checkmark"></span>
-    </label>
-    <label class="container">Radar Hack
-        <input id="radarBox" name="radarBox" type="checkbox">
-        <span class="checkmark"></span>
-    </label>
-    <label class="container">No Flash
-        <input id="noFlashBox" name="noFlashBox" type="checkbox">
-        <span class="checkmark"></span>
-    </label>
-    <label class="container">Glow (flickers)
-        <input id="glowBox" name="glowBox" type="checkbox">
-        <span class="checkmark"></span>
-    </label>
-    <label class="container">Triggerbot
-        <input id="triggerBox" name="triggerBox" type="checkbox">
-        <span class="checkmark"></span>
-    </label>
-    <label class="container">RCS
-        <input id="recoilBox" name="recoilBox" type="checkbox">
-        <span class="checkmark"></span>
-    </label>
-    <form class="tagbox" style="max-width:300px" onsubmit="return false;">
-        <h3>Clantag Changer:</h3>
-        <input type="text" id="tagbox" placeholder="ClanTag" name="set">
-        <button onclick="setClanTagButton()">Set</button>
-    </form>
-    <br>
-    <div>
-        <input id="staticTagBox" type="radio" name="user" value="Static" checked="true">
-        <label for="staticTagBox"><span></span>Static</label>
-
-        <input id="scrollTagBox" type="radio" name="user" value="Scroll">
-        <label for="scrollTagBox"><span></span>Scroll</label>
+    <div class="navbar">
+        <a onclick="openPanel('main')">Main</a>
+        <a onclick="openPanel('clantag')">Clantag</a>
+        <a onclick="openPanel('glow')">Glow</a>
     </div>
+    <div class="menupanel" id="clantag" hidden="true">
+        <form class="tagbox" style="max-width:300px" onsubmit="return false;">
+            <h3>Clantag Changer:</h3>
+            <input type="text" id="tagbox" placeholder="ClanTag" name="set">
+            <button onclick="setClanTagButton()">Set</button>
+        </form>
+        <br>
+        <div>
+            <input id="staticTagBox" type="radio" name="user" value="Static" checked="true">
+            <label for="staticTagBox"><span></span>Static</label>
+    
+            <input id="scrollTagBox" type="radio" name="user" value="Scroll">
+            <label for="scrollTagBox"><span></span>Scroll</label>
+        </div>
+    </div>
+    <div class="menupanel" id="glow" hidden="true">
+        <label class="container">Glow (flickers)
+            <input id="glowBox" name="glowBox" type="checkbox">
+            <span class="checkmark"></span>
+        </label>
+        <h3>Terrorist color:</h3>
+        <input type="color" id="tColor" value="#ffa100" style="width:100px;">
+        <br>
+        <h3>Counter-Terrorist color:</h3>
+        <input type="color" id="ctColor" value="#00a1ff" style="width:100px;">
+    </div>
+    <div class="menupanel" id="main">
+        <label class="container">Bunny Hop
+            <input id="bhopBox" name="bhopBox" type="checkbox">
+            <span class="checkmark"></span>
+        </label>
+        <label class="container">Autostrafe
+            <input id="autostrafeBox" name="autostrafeBox" type="checkbox">
+            <span class="checkmark"></span>
+        </label>
+        <label class="container">Radar Hack
+            <input id="radarBox" name="radarBox" type="checkbox">
+            <span class="checkmark"></span>
+        </label>
+        <label class="container">No Flash
+            <input id="noFlashBox" name="noFlashBox" type="checkbox">
+            <span class="checkmark"></span>
+        </label>
+        <label class="container">Triggerbot
+            <input id="triggerBox" name="triggerBox" type="checkbox">
+            <span class="checkmark"></span>
+        </label>
+        <label class="container">RCS
+            <input id="recoilBox" name="recoilBox" type="checkbox">
+            <span class="checkmark"></span>
+        </label>
+        
+    </div>
+    <!--div style="width: 50%; float: right;">
+        <label class="container">Skin Changer
+            <input id="skinChangerBox" name="skinChangerBox" type="checkbox">
+            <span class="checkmark"></span>
+        </label>
+    </div-->
+    
     <!-- You can also require other files to run in this process -->
     <!--script src="./renderer.js"></script-->
   </body>

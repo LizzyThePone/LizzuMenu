@@ -1,8 +1,5 @@
-// All of the Node.js APIs are available in the preload process.
-// It has the same sandbox as a Chrome extension.
 const memoryjs = require('memoryjs');
 const lizzyjs = require("./build/Release/lizzyjs.node")
-
 
 const { getAsyncKeyState } = require('asynckeystate');
 function getJSON(url) {
@@ -56,19 +53,46 @@ let glow = setInterval( () => {
             let bEntityDormant = memoryjs.readMemory(handle, entity.getEntity(i - 1) + offsets.signatures.m_bDormant, memoryjs.INT);
             let iGlowIndex = memoryjs.readMemory(handle, entity.getEntity(i - 1) + offsets.netvars.m_iGlowIndex, memoryjs.INT);
             let dwGlowObjectManager = memoryjs.readMemory(handle, client + offsets.signatures.dwGlowObjectManager, memoryjs.DWORD);
-            let vector = {
-                w: (iEntityTeam == 2) ? 255 : 0 / 255,
-                x: 161 / 255,
-                y: (iEntityTeam == 2) ? 0 : 255 / 255,
-                z: 200 / 255
+            let ctColor = hexToRgb(document.getElementById("ctColor").value)
+            let tColor = hexToRgb(document.getElementById("tColor").value)
+            function writeGlow(vector) {
+                if (!bEntityDormant || true) {
+                    memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x4), vector, memoryjs.VEC4, (err) => {err ? console.error(err) : true} );
+                    memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x24), true, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
+                    memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x25), false, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
+                    memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x26), false, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
+                }
             }
-            memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x4), vector, memoryjs.VEC4, (err) => {err ? console.error(err) : true} );
-            memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x24), true, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
-            memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x25), false, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
-            memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x26), false, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
+            switch (iEntityTeam) {
+                case 3:
+                    writeGlow({
+                        w: ctColor.r / 255,
+                        x: ctColor.g / 255,
+                        y: ctColor.b / 255,
+                        z: 200 / 255
+                    })
+                    break;
+                case 2:
+                    writeGlow({
+                        w: tColor.r / 255,
+                        x: tColor.g / 255,
+                        y: tColor.b / 255,
+                        z: 200 / 255
+                    })
+                    break;
+            }
         }
     }
 }, 1 )
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+}
 
 let bhop = setInterval( () => {
     if (processObject != undefined && getAsyncKeyState(0x20) && document.getElementById("bhopBox").checked) {
@@ -84,7 +108,7 @@ let recoil = setInterval( () => {
         let vPunch = memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_aimPunchAngle, memoryjs.VEC3)
         let shotsFired = memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_iShotsFired, memoryjs.INT)
 
-        if (shotsFired >= 1) {
+        if (shotsFired >= 2) {
 
             let CurrentViewAngles = local.getViewAngles();
             let NewViewAngles = {}
@@ -166,10 +190,6 @@ let radar = setInterval( () => {
     }
 }, 50)
 
-
-
-
-
 function init() {
     memoryjs.openProcess('csgo.exe', (e, process) => {
         if (e) {
@@ -186,6 +206,8 @@ function init() {
         }
     });
 }
+
+
 
 window.addEventListener('DOMContentLoaded', () => {
     init();
@@ -250,6 +272,16 @@ let getcvar = (str) => {
 		}
 }
 
+let openPanel = panel => {
+    for (let x of document.getElementsByClassName("menupanel")) {
+        if (x.id == panel) {
+            x.hidden = false;
+        } else {
+            x.hidden = true;
+        }
+    }
+}
+
 let readcvar = (str) => {
     //console.log(memoryjs.readMemory(handle, getcvar(str) + 0x30, memoryjs.INT) ^ getcvar(str));
     return memoryjs.readMemory(handle, getcvar(str) + 0x30, memoryjs.INT) ^ getcvar(str);
@@ -271,3 +303,4 @@ let ragdoll = setInterval( () => {
         console.log('Wrote cl_ragdoll_gavity to 0')
     }
 }, 1)*/
+

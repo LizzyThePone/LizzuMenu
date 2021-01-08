@@ -1,6 +1,6 @@
 #include <windows.h>
 #include <psapi.h>
-#include "main.h"
+#include <napi.h>
 
 Napi::Value SetClanTag(const Napi::CallbackInfo& args) {
   Napi::Env env = args.Env();
