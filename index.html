@@ -12,10 +12,18 @@
         <a onclick="openPanel('main')">Main</a>
         <a onclick="openPanel('clantag')">Clantag</a>
         <a onclick="openPanel('glow')">Glow</a>
+        <!--a onclick="openPanel('skins')">Skinchanger</a-->
     </div>
+
+
+    <div class="menupanel" id="skins" hidden="true">
+        
+    </div>
+
+
     <div class="menupanel" id="clantag" hidden="true">
-        <form class="tagbox" style="max-width:300px" onsubmit="return false;">
-            <h3>Clantag Changer:</h3>
+        <form class="tagbox" style="max-width:340px" onsubmit="return false;">
+            <h3 style="text-align: center;">Clantag Changer:</h3>
             <input type="text" id="tagbox" placeholder="ClanTag" name="set">
             <button onclick="setClanTagButton()">Set</button>
         </form>
@@ -26,10 +34,17 @@
     
             <input id="scrollTagBox" type="radio" name="user" value="Scroll">
             <label for="scrollTagBox"><span></span>Scroll</label>
+
+            <input id="buildTagBox" type="radio" name="user" value="build">
+            <label for="buildTagBox"><span></span>Build</label>
         </div>
-        <h4>Interval:</h4>
-        <input type="number" id="tagintervalbox" value="750" min="250" style="width: 60px;">ms
+        <h4 style="display: inline-block;">Interval:</h4>
+        <input type="number" id="tagintervalbox" value="750" min="250" style="width: 60px; ">ms
+        <br><br>
+        <p id="tagDisplay" style="text-align: center;"></p>
     </div>
+
+
     <div class="menupanel" id="glow" hidden="true">
         <label class="container">Glow (flickers)
             <input id="glowBox" name="glowBox" type="checkbox">
@@ -41,6 +56,8 @@
         <h3>Counter-Terrorist color:</h3>
         <input type="color" id="ctColor" value="#00a1ff" style="width:100px;">
     </div>
+
+
     <div class="menupanel" id="main">
         <label class="container">Bunny Hop
             <input id="bhopBox" name="bhopBox" type="checkbox">

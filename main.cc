@@ -61,9 +61,44 @@ Napi::Value SetClanTag(const Napi::CallbackInfo& args) {
   return env.Null();
 }
 
+#pragma pack(push,1)
+struct ClientCmd_Unrestricted_t
+{
+  const char* command;
+  bool        delay;
+};
+#pragma pack(pop)
+
+Napi::Value Console(const Napi::CallbackInfo& args) {
+	Napi::Env env = args.Env();
+
+  	if (!args[0].IsNumber() && !args[1].IsNumber() && !args[2].IsString()) {
+    	Napi::Error::New(env, "first and second argument must be a number, third argument must be a string").ThrowAsJavaScriptException();
+    	return env.Null();
+  	}
+
+	std::string commandArg(args[2].As<Napi::String>().Utf8Value());
+  	const char* command = commandArg.c_str();
+  	HANDLE ProcessHandle = (HANDLE)args[0].As<Napi::Number>().Int64Value();
+  	DWORD address = args[1].As<Napi::Number>().Int64Value();
+	ClientCmd_Unrestricted_t commandArgs;
+ 
+    commandArgs.command = command;
+    commandArgs.delay   = false;
+ 
+	LPVOID addr = (LPVOID)address;
+	LPVOID vArgs = (LPVOID)VirtualAllocEx(ProcessHandle, NULL, sizeof(args), MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+	WriteProcessMemory(ProcessHandle, vArgs, (LPCVOID&)commandArgs, sizeof(args), NULL);
+	HANDLE hThread = CreateRemoteThread(ProcessHandle, NULL, NULL, (LPTHREAD_START_ROUTINE)addr, vArgs, NULL, NULL);
+	WaitForSingleObject(hThread, INFINITE);
+	VirtualFreeEx(ProcessHandle, vArgs, strlen(command) + 1, MEM_RELEASE);
+    CloseHandle(hThread);
+}
+
 
 Napi::Object init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "setClanTag"), Napi::Function::New(env, SetClanTag));
+  exports.Set(Napi::String::New(env, "console"), Napi::Function::New(env, Console));
   return exports;
 }
 

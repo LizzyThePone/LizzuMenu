@@ -230,11 +230,32 @@ let setClanTagButton = () => {
         }
         tag()
     } 
+    if (document.getElementById('buildTagBox').checked){
+        let originalTag = document.getElementById('tagbox').value
+        let currentTag = originalTag
+        let direction = true
+        let position = 0
+        tag = () => {
+            if (document.getElementById('buildTagBox').checked){
+                if (direction){
+                    position++
+                } else {
+                    position--
+                }
+                setClanTag(currentTag.substring(0, position))
+                if(position == originalTag.length || position == 0){
+                    direction = !direction
+                }
+                setTimeout(tag, document.getElementById('tagintervalbox').value)
+            }
+        }
+        tag()
+    } 
 }
 
 let setClanTag = (tag) => {
     lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, " " + tag)
-    console.log(`Set tag to ${tag}`)
+    document.getElementById('tagDisplay').innerHTML = tag
 }
 
 let getcvar = (str) => {
@@ -293,4 +314,17 @@ let ragdoll = setInterval( () => {
         console.log('Wrote cl_ragdoll_gavity to 0')
     }
 }, 1)*/
+
+let clientCMD = () => {
+    const signature = '55 8B EC 8B 0D ? ? ? ? 81 F9 ? ? ? ? 75 0C A1 ? ? ? ? 35 ? ? ? ? EB 05 8B 01 FF 50 34 50';
+    const signatureTypes = memoryjs.READ | memoryjs.SUBTRACT;
+    const patternOffset = 0x1;
+    const addressOffset = 0;
+    const clientCMDPointer = memoryjs.findPattern(handle, "engine.dll", signature, signatureTypes, patternOffset, addressOffset);
+    return clientCMDPointer;
+}
+
+let consoleCMD = command => {
+    lizzyjs.console(handle, clientCMD(), command)
+}
 
