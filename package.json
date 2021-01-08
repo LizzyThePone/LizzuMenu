@@ -2,6 +2,8 @@
   "dependencies": {
     "asynckeystate": "^0.0.5",
     "electron-squirrel-startup": "^1.0.0",
+    "iohook": "^0.7.2",
+    "key-events": "^0.1.1",
     "memoryjs": "github:Rob--/memoryjs",
     "node-addon-api": "^3.1.0"
   },
@@ -9,5 +11,18 @@
   "scripts": {
     "run": "electron src/main",
     "build": "npm rebuild; node-gyp build"
+  },
+  "iohook": {
+    "targets": [
+      "node-88",
+      "electron-85"
+    ],
+    "platforms": [
+      "win32"
+    ],
+    "arches": [
+      "x64",
+      "ia32"
+    ]
   }
 }

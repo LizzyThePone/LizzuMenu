@@ -1,5 +1,5 @@
 const memoryjs = require('memoryjs');
-const lizzyjs = require("./build/Release/lizzyjs.node")
+const lizzyjs = require("./build/Release/lizzyjs.node");
 
 const { getAsyncKeyState } = require('asynckeystate');
 function getJSON(url) {
@@ -45,7 +45,7 @@ let local = {
 let entity = {
     getEntity: (EntId) => memoryjs.readMemory(handle, client + offsets.signatures.dwEntityList + ((EntId) * 0x10), memoryjs.INT),
     getTeamNum: (EntId) => memoryjs.readMemory(handle, entity.getEntity(EntId) + offsets.netvars.m_iTeamNum, memoryjs.INT)
-}
+} 
 
 let glow = setInterval( () => {
     if (processObject != undefined && document.getElementById("glowBox").checked){

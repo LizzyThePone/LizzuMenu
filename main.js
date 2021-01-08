@@ -1,6 +1,7 @@
 const { hidden } = require('ansi-styles');
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
+//const ioHook = require('iohook');
 
 
 function createWindow () {

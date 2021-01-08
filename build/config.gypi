@@ -77,17 +77,11 @@
     "v8_trace_maps": 0,
     "v8_use_siphash": 1,
     "want_separate_host_toolset": 0,
-    "nodedir": "C:\\Users\\Administrator\\AppData\\Local\\node-gyp\\Cache\\15.5.1",
+    "nodedir": "C:\\Users\\Administrator\\Desktop\\lizmenu\\11.1.1",
     "standalone_static_library": 1,
     "msbuild_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
-    "cache": "C:\\Users\\Administrator\\AppData\\Local\\npm-cache",
-    "globalconfig": "C:\\Users\\Administrator\\AppData\\Roaming\\npm\\etc\\npmrc",
-    "init.module": "C:\\Users\\Administrator\\.npm-init.js",
-    "init_module": "C:\\Users\\Administrator\\.npm-init.js",
-    "metrics_registry": "https://registry.npmjs.org/",
-    "node_gyp": "C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-gyp\\bin\\node-gyp.js",
-    "prefix": "C:\\Users\\Administrator\\AppData\\Roaming\\npm",
-    "userconfig": "C:\\Users\\Administrator\\.npmrc",
-    "user_agent": "npm/7.3.0 node/v15.5.1 win32 x64"
+    "runtime": "electron",
+    "target": "11.1.1",
+    "build_from_source": "true"
   }
 }
