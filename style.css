@@ -60,6 +60,28 @@ input[type="radio"]:checked + label span {
   background: #7289DA;
   background-clip: content-box;
 }
+
+input[type="checkbox"]{
+  display: none;
+}
+input[type="checkbox"] + label span {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  background: transparent;
+  vertical-align: middle;
+  border: 2px solid #7289DA;
+  border-radius: 50%;
+  padding: 2px;
+  margin:0 5px;
+}
+input[type="checkbox"]:checked + label span {
+  width: 15px;
+  height: 15px;
+  background: #7289DA;
+  background-clip: content-box;
+}
+
 form.tagbox input[type=text] {
   padding: 10px;
   font-size: 17px;

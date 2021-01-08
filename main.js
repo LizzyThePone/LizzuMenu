@@ -1,7 +1,8 @@
 const { hidden } = require('ansi-styles');
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
-//const ioHook = require('iohook');
+const ioHook = require('iohook');
+
 
 
 function createWindow () {
@@ -11,6 +12,7 @@ function createWindow () {
     //resizable: false,
     titleBarStyle: 'hidden',
     backgroundColor: "#191b1c",
+    alwaysOnTop: true,
     webPreferences: {
         nodeIntegration: true,
         webSecurity: false
@@ -19,6 +21,17 @@ function createWindow () {
 
   mainWindow.setMenuBarVisibility(false)
   mainWindow.loadFile('index.html')
+  ioHook.on('keydown', event => {
+    if (event.rawcode == 45){
+      if (mainWindow.isMinimized()){
+        mainWindow.restore()
+        mainWindow.show()
+      } else {
+        mainWindow.minimize()
+      }
+    }
+  });
+  ioHook.start();
 
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()

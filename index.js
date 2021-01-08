@@ -84,7 +84,7 @@ let glow = setInterval( () => {
             }
         }
     }
-}, 2 )
+}, 1 )
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -103,12 +103,13 @@ let bhop = setInterval( () => {
     }
 }, 1 )
 
+/*
 let aimbot = setInterval( () => {
     if (processObject != undefined && getAsyncKeyState(0x06) && local.getState() == 6) {
         lizzyjs.aim()
         console.log('aim')
     }
-}, 1 )
+}, 1 )*/
 
 let OldAimPunch = {}
 let recoil = setInterval( () => {
@@ -188,7 +189,7 @@ let trigger = setInterval( () => {
         local.forceAttack();
       }
     }
-}, 50 )
+}, 25 )
 
 let radar = setInterval( () => {
     if (processObject != undefined && document.getElementById("radarBox").checked && local.getLocal() != 0 && local.getState() == 6){
@@ -221,7 +222,10 @@ window.addEventListener('DOMContentLoaded', () => {
     init();
 })
 
+let tagTimeout
+
 let setClanTagButton = () => {
+    clearInterval(tagTimeout)
     if (document.getElementById('staticTagBox').checked){
         setClanTag(document.getElementById('tagbox').value)
     } 
@@ -235,7 +239,7 @@ let setClanTagButton = () => {
                 let z = currentTag.substring(1)
                 currentTag = z + currentTag.charAt(0)
                 setClanTag(currentTag)
-                setTimeout(tag, document.getElementById('tagintervalbox').value)
+                tagTimeout = setTimeout(tag, document.getElementById('tagintervalbox').value)
             }
             if (document.getElementById('buildTagBox').checked){
                 if (direction){
@@ -247,7 +251,7 @@ let setClanTagButton = () => {
                 if(position == originalTag.length || position == 0){
                     direction = !direction
                 }
-                setTimeout(tag, document.getElementById('tagintervalbox').value)
+                tagTimeout = setTimeout(tag, document.getElementById('tagintervalbox').value)
             }
         }
         tag()
@@ -256,7 +260,9 @@ let setClanTagButton = () => {
 
 let setClanTag = (tag) => {
     if (local.getState() == 6){
-        lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, " " + tag)
+        let append = document.getElementById('nlTagBox').checked ? "\n" : ""
+        console.log(tag + append)
+        lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, tag + append)
     }
     document.getElementById('tagDisplay').innerHTML = tag
 }
