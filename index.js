@@ -213,16 +213,6 @@ window.addEventListener('DOMContentLoaded', () => {
     init();
 })
 
-let scrollTag = () => {
-    let originalTag = document.getElementById('tagbox').value
-    let currentTag = originalTag
-    return setInterval(() => {
-        let z = currentTag.substring(1)
-        currentTag = z + currentTag.charAt(0)
-        setClanTag(currentTag)
-    }, 500);
-} 
-
 let setClanTagButton = () => {
     if (document.getElementById('staticTagBox').checked){
         setClanTag(document.getElementById('tagbox').value)
@@ -235,7 +225,7 @@ let setClanTagButton = () => {
                 let z = currentTag.substring(1)
                 currentTag = z + currentTag.charAt(0)
                 setClanTag(currentTag)
-                setTimeout(tag, 600)
+                setTimeout(tag, document.getElementById('tagintervalbox').value)
             }
         }
         tag()
