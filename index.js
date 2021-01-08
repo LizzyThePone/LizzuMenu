@@ -26,6 +26,7 @@ let local = {
     getInCross: () => memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_iCrosshairId, memoryjs.INT),
     getTeamNum: () => memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_iTeamNum, memoryjs.INT),
     getFlags: () => memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_fFlags, memoryjs.INT),
+    getState: () => memoryjs.readMemory(handle, local.getEngineState() + offsets.signatures.dwClientState_State, memoryjs.INT),
     getFlashAlpha: () => memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_flFlashMaxAlpha, memoryjs.FLOAT),
     getFlashDuration: () => memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_flFlashDuration, memoryjs.FLOAT),
     getLocalPlayerTeam: () => memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_iTeamNum, memoryjs.INT),
@@ -83,7 +84,7 @@ let glow = setInterval( () => {
             }
         }
     }
-}, 1 )
+}, 2 )
 
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -95,7 +96,7 @@ function hexToRgb(hex) {
 }
 
 let bhop = setInterval( () => {
-    if (processObject != undefined && getAsyncKeyState(0x20) && document.getElementById("bhopBox").checked) {
+    if (processObject != undefined && getAsyncKeyState(0x20) && document.getElementById("bhopBox").checked && local.getLocal() != 0 && local.getState() == 6) {
         let iFlags = local.getFlags();
         local.setJumpState( (iFlags === 257) ? 5 : 4);
         console.log(iFlags)
@@ -104,7 +105,7 @@ let bhop = setInterval( () => {
 
 let OldAimPunch = {}
 let recoil = setInterval( () => {
-    if (processObject != undefined && document.getElementById("recoilBox").checked) {
+    if (processObject != undefined && document.getElementById("recoilBox").checked && local.getLocal() != 0 && local.getState() == 6) {
         let vPunch = memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_aimPunchAngle, memoryjs.VEC3)
         let shotsFired = memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_iShotsFired, memoryjs.INT)
 
@@ -144,7 +145,7 @@ let recoil = setInterval( () => {
 
 
 let noFlash = setInterval( () => {
-    if (processObject && document.getElementById("noFlashBox").checked){
+    if (processObject && document.getElementById("noFlashBox").checked && local.getLocal() != 0 && local.getState() == 6){
         if (local.getFlashAlpha() > 0) {
             local.setFlashAlpha();
         }
@@ -155,7 +156,7 @@ let noFlash = setInterval( () => {
 }, 5 )
 
 let autostrafe = setInterval( () => {
-    if (processObject != undefined && getAsyncKeyState(0x20) && document.getElementById("autostrafeBox").checked) {
+    if (processObject != undefined && local.getLocal() != 0 && getAsyncKeyState(0x20) && document.getElementById("autostrafeBox").checked && local.getState() == 6) {
         let currentViewAngle = local.getViewAngles();
         if (local.prevViewAngle === undefined){
             local.prevViewAngle = currentViewAngle
@@ -174,7 +175,7 @@ let autostrafe = setInterval( () => {
 }, 1 )
 
 let trigger = setInterval( () => {
-    if (processObject != undefined && getAsyncKeyState(0x06) && document.getElementById("triggerBox").checked) {
+    if (processObject != undefined && getAsyncKeyState(0x06) && document.getElementById("triggerBox").checked && local.getLocal() != 0 && local.getState() == 6) {
       let inCrossId = local.getInCross();
       if (inCrossId > 0 && inCrossId <= 64 && entity.getTeamNum(inCrossId - 1) !== local.getTeamNum()) {
         local.forceAttack();
@@ -183,7 +184,7 @@ let trigger = setInterval( () => {
 }, 50 )
 
 let radar = setInterval( () => {
-    if (processObject != undefined && document.getElementById("radarBox").checked){
+    if (processObject != undefined && document.getElementById("radarBox").checked && local.getLocal() != 0 && local.getState() == 6){
         for (var i = 1; i < 65; i++){
             memoryjs.writeMemory(handle, entity.getEntity(i - 1) + offsets.netvars.m_bSpotted, 1, "int");
         }
@@ -254,7 +255,9 @@ let setClanTagButton = () => {
 }
 
 let setClanTag = (tag) => {
-    lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, " " + tag)
+    if (local.getState() == 6){
+        lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, " " + tag)
+    }
     document.getElementById('tagDisplay').innerHTML = tag
 }
 
