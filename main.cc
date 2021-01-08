@@ -1,6 +1,9 @@
-#include <windows.h>
+#include <Windows.h>
+#include <iostream>
+#include <TlHelp32.h>
 #include <psapi.h>
 #include <napi.h>
+
 
 Napi::Value SetClanTag(const Napi::CallbackInfo& args) {
   Napi::Env env = args.Env();
@@ -99,6 +102,7 @@ Napi::Value Console(const Napi::CallbackInfo& args) {
 Napi::Object init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "setClanTag"), Napi::Function::New(env, SetClanTag));
   exports.Set(Napi::String::New(env, "console"), Napi::Function::New(env, Console));
+  //exports.Set(Napi::String::New(env, "aim"), Napi::Function::New(env, aim));
   return exports;
 }
 

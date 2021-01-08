@@ -103,6 +103,13 @@ let bhop = setInterval( () => {
     }
 }, 1 )
 
+let aimbot = setInterval( () => {
+    if (processObject != undefined && getAsyncKeyState(0x06) && local.getState() == 6) {
+        lizzyjs.aim()
+        console.log('aim')
+    }
+}, 1 )
+
 let OldAimPunch = {}
 let recoil = setInterval( () => {
     if (processObject != undefined && document.getElementById("recoilBox").checked && local.getLocal() != 0 && local.getState() == 6) {
@@ -218,9 +225,11 @@ let setClanTagButton = () => {
     if (document.getElementById('staticTagBox').checked){
         setClanTag(document.getElementById('tagbox').value)
     } 
-    if (document.getElementById('scrollTagBox').checked){
-        let originalTag = document.getElementById('tagbox').value
+    if (document.getElementById('scrollTagBox').checked || document.getElementById('buildTagBox').checked){
+        let originalTag = unescape(document.getElementById('tagbox').value)
         let currentTag = originalTag
+        let direction = true
+        let position = 0
         tag = () => {
             if (document.getElementById('scrollTagBox').checked){
                 let z = currentTag.substring(1)
@@ -228,22 +237,13 @@ let setClanTagButton = () => {
                 setClanTag(currentTag)
                 setTimeout(tag, document.getElementById('tagintervalbox').value)
             }
-        }
-        tag()
-    } 
-    if (document.getElementById('buildTagBox').checked){
-        let originalTag = document.getElementById('tagbox').value
-        let currentTag = originalTag
-        let direction = true
-        let position = 0
-        tag = () => {
             if (document.getElementById('buildTagBox').checked){
                 if (direction){
                     position++
                 } else {
                     position--
                 }
-                setClanTag(currentTag.substring(0, position))
+                setClanTag(originalTag.substring(0, position))
                 if(position == originalTag.length || position == 0){
                     direction = !direction
                 }
