@@ -32,6 +32,7 @@ let local = {
     getLocalPlayerTeam: () => memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_iTeamNum, memoryjs.INT),
     getEngineState: () => memoryjs.readMemory(handle, engine + offsets.signatures.dwClientState, memoryjs.DWORD),
     getViewAngles: () => memoryjs.readMemory(handle, local.getEngineState() + offsets.signatures.dwClientState_ViewAngles, memoryjs.VEC3),
+    getEyePos: () => memoryjs.readMemory(handle, local.getLocal() + m_vecViewOffset, memoryjs.VEC3),
 
     forceAttack: () => memoryjs.writeMemory(handle, client + offsets.signatures.dwForceAttack, 6, memoryjs.INT, (err) => { err ? console.error(err) : true }),
     forceLeft: () => memoryjs.writeMemory(handle, client + offsets.signatures.dwForceLeft, 6, memoryjs.INT, (err) => { err ? console.error(err) : true }),
@@ -199,6 +200,26 @@ let radar = setInterval( () => {
     }
 }, 50)
 
+let lagBool = true
+let fakeLag = setInterval(() => {
+    if (processObject != undefined && document.getElementById("lagBox").checked && local.getLocal() != 0 && local.getState() == 6){
+        if (document.getElementById("lagBox").checked) {
+            if (lagBool){
+                memoryjs.writeMemory(handle, engine + offsets.signatures.dwbSendPackets, false, "bool");
+                lagBool = false
+            } else {
+                memoryjs.writeMemory(handle, engine + offsets.signatures.dwbSendPackets, true, "bool");
+                lagBool = true
+            }
+        } else {
+            if (!lagBool) {
+                memoryjs.writeMemory(handle, engine + offsets.signatures.dwbSendPackets, true, "bool");
+                lagBool = true
+            }
+        }
+    }
+}, 50)
+
 function init() {
     memoryjs.openProcess('csgo.exe', (e, process) => {
         if (e) {
@@ -337,3 +358,28 @@ let consoleCMD = command => {
     lizzyjs.console(handle, clientCMD(), command)
 }
 
+/*
+function getClosestTarget(fov)
+{
+	let viewAngles = local.getViewAngles();
+	let localEyePos = local.getEyePos();
+
+	let bestEntity;
+
+	for (i = 0; i < 64; i++)
+	{
+		if (entity.getTeamNum(i) !== local.getTeamNum())
+		{
+			let angle = CalcAngle(localEyePos, Entity::getEntBonePos(Entity::getEntBase(i), Hacks::AimBone));
+			let cAngles = ClampAngles(angle - viewAngles);
+			let delta = sqrt(cAngles.x * cAngles.x + cAngles.y * cAngles.y);
+
+			if (delta < fov)
+			{
+				fov = delta;
+				bestEntity = Entity::getEntBase(i);
+			}
+		}
+	}
+	return bestEntity;
+}*/

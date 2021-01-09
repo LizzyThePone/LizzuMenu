@@ -8,11 +8,11 @@ const ioHook = require('iohook');
 function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 400,
-    height: 422,
+    height: 480,
     //resizable: false,
     titleBarStyle: 'hidden',
     backgroundColor: "#191b1c",
-    alwaysOnTop: true,
+    //alwaysOnTop: true,
     webPreferences: {
         nodeIntegration: true,
         webSecurity: false
