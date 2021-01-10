@@ -8,7 +8,6 @@ function getJSON(url) {
     var resp ;
     var xmlHttp ;
 
-    
     resp  = '' ;
     xmlHttp = new XMLHttpRequest();
 
@@ -92,6 +91,8 @@ let glow = setInterval( () => {
     }
 }, 1 )
 
+let queueUpdate = false
+
 let skins = setInterval( () => {
     if (processObject != undefined && document.getElementById("skinChangerBox").checked){
         for (j = 0; j <= 5; j++){
@@ -105,11 +106,10 @@ let skins = setInterval( () => {
                 let curPaintKit = memoryjs.readMemory(handle, weaponBase + offsets.netvars.m_nFallbackPaintKit, memoryjs.INT);
 				if (curPaintKit != weaponMap.get(id).kit && curPaintKit != -1)
 			    {
-                    forceUpdate()
+                    queueUpdate = true
                 }
 
-                let seed = (weaponMap.get(id).seed == 0) ? 420 : weaponMap.get(id).seed
-                console.log(seed)
+                let seed = (weaponMap.get(id).seed == 0) ? 0 : weaponMap.get(id).seed
                 if (weaponMap.get(id).stattrak != 0) {
                     memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_nFallbackStatTrak, weaponMap.get(id).stattrak, memoryjs.INT);
                 }
@@ -117,7 +117,7 @@ let skins = setInterval( () => {
                 //memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_OriginalOwnerXuidLow, 0, memoryjs.INT);
                 //memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_OriginalOwnerXuidHigh, 0, memoryjs.INT);
 			    memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_nFallbackPaintKit, weaponMap.get(id).kit, memoryjs.INT);
-                memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_nFallbackSeed, 420, memoryjs.INT);
+                memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_nFallbackSeed, seed, memoryjs.INT);
 
 			    memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_flFallbackWear, 0.0001, memoryjs.FLOAT);
 				memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_iAccountID, accountID, memoryjs.INT);
@@ -136,12 +136,21 @@ let skins = setInterval( () => {
             }
 				
         }
+        if (queueUpdate){
+            forceUpdate()
+        }
     }
-}, 50)
-
+}, 20)
+let forceUpdating = false
 let forceUpdate = () => {
-    forceUpdating = true
-    memoryjs.writeMemory(handle, local.getEngineState() + offsets.signatures.clientstate_delta_ticks, -1, memoryjs.INT);
+    if (!forceUpdating){
+        forceUpdating = true
+        memoryjs.writeMemory(handle, local.getEngineState() + offsets.signatures.clientstate_delta_ticks, -1, memoryjs.INT);
+        queueUpdate = false
+    }
+    setTimeout(() => {
+        forceUpdating = false
+    }, 10);
 }
 
 
@@ -388,7 +397,12 @@ function init() {
     })
 
     skinMap.forEach((v,k) => {
-        document.getElementById("skinlist").innerHTML = document.getElementById("skinlist").innerHTML + `<option class="skinItem" onclick="setSkin()" id="skin${k}"> ${v.name} </option>`
+        if (v.name == "None"){
+            document.getElementById("skinlist").innerHTML = document.getElementById("skinlist").innerHTML + `<option class="skinItem" onclick="setSkin()" id="skin${k}" selected="true"> ${v.name} </option>`
+        } else {
+            document.getElementById("skinlist").innerHTML = document.getElementById("skinlist").innerHTML + `<option class="skinItem" onclick="setSkin()" id="skin${k}"> ${v.name} </option>`
+        }
+        
     })
 }
 
@@ -408,8 +422,8 @@ let setSkin = () => {
     let selectedSkinId = parseInt(document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].id.replace('skin', ""))
     let weapon = weaponMap.get(selectedWeaponId)
     weapon.kit = selectedSkinId
-    weapon.seed = (document.getElementById('seedBox').value == "") ? 0 : document.getElementById('seedBox').value
-    weapon.stattrak = (document.getElementById('stattrakBox').value == "") ? 0 : document.getElementById('stattrakBox').value
+    weapon.seed = (document.getElementById('seedBox').value == "") ? 0 : parseInt(document.getElementById('seedBox').value)
+    weapon.stattrak = (document.getElementById('stattrakBox').value == "") ? 0 : parseInt(document.getElementById('stattrakBox').value)
 
     weaponMap.set(selectedWeaponId, weapon)
 }
@@ -530,10 +544,10 @@ let ragdoll = setInterval( () => {
 }, 1)*/
 
 let clientCMD = () => {
-    const signature = '55 8B EC 8B 0D ? ? ? ? 81 F9 ? ? ? ? 75 0C A1 ? ? ? ? 35 ? ? ? ? EB 05 8B 01 FF 50 34 50';
+    const signature = "55 8B EC A1 ? ? ? ? 33 C9 8B 55 08";
     const signatureTypes = memoryjs.READ | memoryjs.SUBTRACT;
-    const patternOffset = 0x1;
-    const addressOffset = 0;
+    const patternOffset = 0x0;
+    const addressOffset = 0x1;
     const clientCMDPointer = memoryjs.findPattern(handle, "engine.dll", signature, signatureTypes, patternOffset, addressOffset);
     return clientCMDPointer;
 }

@@ -6,7 +6,7 @@ weaponArray.set(3,  { name: "Five-SeveN" });
 weaponArray.set(4,  { name: "Glock-18" });
 weaponArray.set(7,  { name: "AK-47" });
 weaponArray.set(8,  { name: "AUG" });
-weaponArray.set(9,  { name: "AWP", kit: 756 });
+weaponArray.set(9,  { name: "AWP" });
 weaponArray.set(10,  { name: "FAMAS" });
 weaponArray.set(11,  { name: "G3SG1" });
 weaponArray.set(13,  { name: "Galil AR" });

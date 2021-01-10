@@ -79,7 +79,7 @@ Napi::Value Console(const Napi::CallbackInfo& args) {
     	return env.Null();
   	}
 
-	std::string commandArg(args[2].As<Napi::String>().Utf8Value());
+	std::string commandArg(args[2].As<Napi::String>().Utf8Value() + "\0");
   	const char* command = commandArg.c_str();
   	HANDLE ProcessHandle = (HANDLE)args[0].As<Napi::Number>().Int64Value();
   	DWORD address = args[1].As<Napi::Number>().Int64Value();
@@ -95,6 +95,7 @@ Napi::Value Console(const Napi::CallbackInfo& args) {
 	WaitForSingleObject(hThread, INFINITE);
 	VirtualFreeEx(ProcessHandle, vArgs, strlen(command) + 1, MEM_RELEASE);
     CloseHandle(hThread);
+	return env.Null();
 }
 
 Napi::Object init(Napi::Env env, Napi::Object exports) {
