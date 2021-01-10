@@ -41,6 +41,26 @@ body {
   color: black;
 }
 
+.setskins {
+  float: right;
+  width: 80px;
+  height: 40px;
+  padding: 10px;
+  border-top: 25px;
+  background:  #7289DA;
+  border-top: 25px;
+  color: white;
+  font-size: 17px;
+  border: 1px solid #7289DA;
+  border-left: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.setskins :hover {
+  background:  #7FA0E8;
+}
+
 input[type="radio"]{
   display: none;
 }
