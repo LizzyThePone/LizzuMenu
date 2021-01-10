@@ -221,6 +221,7 @@ let recoil = setInterval( () => {
         let shotsFired = memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_iShotsFired, memoryjs.INT)
 
         if (shotsFired >= 2) {
+            console.log(shotsFired)
 
             let CurrentViewAngles = local.getViewAngles();
             let NewViewAngles = {}
@@ -317,35 +318,34 @@ let aimassist = setInterval(() => {
 
 let normalizeAngles = angles => {
     
-	if (angles.x > 89)
-	{
-		angles.x = 89;
-	}
-	else if (-89 > angles.x)
-	{
-		angles.x = -89;
-	}
- 
-	if (angles.y > 180)
-	{
-		angles.y -= 360;
-	}
-	else if (-180 > angles.y)
-	{
-		angles.y += 360;
-    }
-    
-    if (isNaN(angles.x)) {
-        angles.x = 0
-    }
-
-    if (isNaN(angles.y)) {
-        angles.y = 0
-    }
- 
-	angles.z = 0;
- 
-	return angles;
+	if(angles.x > 89) {
+        angles.x = 89;
+      }
+      if(angles.x < -89) {
+        angles.x = -89;
+      }
+      while(angles.y > 180) {
+        angles.y = angles.y - 360;
+      }
+      while(angles.y < -180) {
+        angles.y = angles.y + 360;
+      }
+      if(angles.y > 180) {
+        angles.y = 180;
+      }
+      if(angles.y < -180) {
+        angles.y = -180;
+      }
+      if(typeof angles.x != 'number' || Number.isNaN(angles.x)) {
+        angles.x = 0;
+      }
+      if(typeof angles.y != 'number' || Number.isNaN(angles.y)) {
+        angles.y = 0;
+      }
+      if(angles.z != 0) {
+        angles.z = 0;
+      }
+      return angles;
 }
 
 
@@ -356,6 +356,16 @@ let radar = setInterval( () => {
         }
     }
 }, 50)
+
+/*
+let grenade = setInterval( () => {
+    if (processObject != undefined && document.getElementById("grenadeBox").checked && local.getLocal() != 0 && local.getState() == 6){
+        memoryjs.writeMemory(handle, client + 0xCFD7A0, 113, memoryjs.BYTE);
+    } else {
+        memoryjs.writeMemory(handle, client + 0xCFD7A0, 112, memoryjs.BYTE);
+    }
+    
+})*/
 
 let lagBool = true
 let fakeLag = setInterval(() => {
@@ -530,7 +540,7 @@ let readcvar = (str) => {
 let writecvar = (str, value, valueType) => {
     //memoryjs.writeMemory(handle, getcvar(str) + 0x50, 0, memoryjs.INT);
     memoryjs.writeMemory(handle, getcvar(str) + 0x14, 0, memoryjs.INT);
-    memoryjs.writeMemory(handle, getcvar(str) + 0x2C, value ^ getcvar(str), memoryjs.FLOAT);
+    memoryjs.writeMemory(handle, getcvar(str) + 0x30, value, memoryjs.FLOAT);
     //memoryjs.writeMemory(handle, getcvar(str) + 0x50, 0, memoryjs.INT);
 }
 
@@ -546,8 +556,19 @@ let ragdoll = setInterval( () => {
 let clientCMD = () => {
     const signature = "55 8B EC A1 ? ? ? ? 33 C9 8B 55 08";
     const signatureTypes = memoryjs.READ | memoryjs.SUBTRACT;
-    const patternOffset = 0x0;
-    const addressOffset = 0x1;
+    const patternOffset = 0x1;
+    const addressOffset = 0x0;
+    const clientCMDPointer = memoryjs.findPattern(handle, "engine.dll", signature, signatureTypes, patternOffset, addressOffset);
+    return clientCMDPointer;
+}
+
+
+
+let grenadeOffset = () => {
+    const signature = "a1 ? ? ? ? ff 0d ? ? ? ? ff 0d";
+    const signatureTypes = memoryjs.READ | memoryjs.SUBTRACT;
+    const patternOffset = 0x1;
+    const addressOffset = 48;
     const clientCMDPointer = memoryjs.findPattern(handle, "engine.dll", signature, signatureTypes, patternOffset, addressOffset);
     return clientCMDPointer;
 }
@@ -556,29 +577,17 @@ let consoleCMD = command => {
     lizzyjs.console(handle, clientCMD(), command)
 }
 
-/*
-function getClosestTarget(fov)
-{
-	let viewAngles = local.getViewAngles();
-	let localEyePos = local.getEyePos();
-
-	let bestEntity;
-
-	for (i = 0; i < 64; i++)
-	{
-		if (entity.getTeamNum(i) !== local.getTeamNum())
-		{
-			let angle = CalcAngle(localEyePos, Entity::getEntBonePos(Entity::getEntBase(i), Hacks::AimBone));
-			let cAngles = ClampAngles(angle - viewAngles);
-			let delta = sqrt(cAngles.x * cAngles.x + cAngles.y * cAngles.y);
-
-			if (delta < fov)
-			{
-				fov = delta;
-				bestEntity = Entity::getEntBase(i);
-			}
-		}
-	}
-	return bestEntity;
+function getClosest() {
+    let w2sHead, aimPlayer, lowestDist = 6969;
+    
+    for (var i = 1; i < 65; i++){
+        let ent = entity.getEntity(i)
+        if (entity.getTeamNum(ent) !== local.getTeamNum()) {
+            local.forceAttack();
+        }
+    }
+    
 }
-*/
+
+
+

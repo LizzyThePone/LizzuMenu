@@ -209,3 +209,11 @@ form.tagbox::after {
     -ms-transform: rotate(45deg);
     transform: rotate(45deg);
   }
+
+  ::-webkit-scrollbar {
+    background-color: #333;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #111;
+}
