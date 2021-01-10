@@ -2,13 +2,20 @@ const { hidden } = require('ansi-styles');
 const {app, BrowserWindow} = require('electron')
 const path = require('path')
 const ioHook = require('iohook');
+const http = require('https');
+const fs = require('fs');
+
+const file = fs.createWriteStream("offsets.hpp");
+const request = http.get("https://raw.githubusercontent.com/frk1/hazedumper/master/csgo.hpp", function(response) {
+  response.pipe(file);
+});
 
 
 
 function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 400,
-    height: 480,
+    height: 530,
     //resizable: false,
     titleBarStyle: 'hidden',
     backgroundColor: "#191b1c",
@@ -23,11 +30,16 @@ function createWindow () {
   mainWindow.loadFile('index.html')
   ioHook.on('keydown', event => {
     if (event.rawcode == 45){
+
+      if (!mainWindow.isMinimized() && mainWindow.isVisible()) {
+        mainWindow.minimize()
+        return
+      }
       if (mainWindow.isMinimized()){
         mainWindow.restore()
+      } 
+      if (!mainWindow.isVisible()){
         mainWindow.show()
-      } else {
-        mainWindow.minimize()
       }
     }
   });

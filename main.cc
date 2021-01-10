@@ -4,7 +4,6 @@
 #include <psapi.h>
 #include <napi.h>
 
-
 Napi::Value SetClanTag(const Napi::CallbackInfo& args) {
   Napi::Env env = args.Env();
   if (!args[0].IsNumber() && !args[1].IsNumber() && !args[2].IsString()) {
@@ -98,11 +97,10 @@ Napi::Value Console(const Napi::CallbackInfo& args) {
     CloseHandle(hThread);
 }
 
-
 Napi::Object init(Napi::Env env, Napi::Object exports) {
   exports.Set(Napi::String::New(env, "setClanTag"), Napi::Function::New(env, SetClanTag));
   exports.Set(Napi::String::New(env, "console"), Napi::Function::New(env, Console));
-  //exports.Set(Napi::String::New(env, "aim"), Napi::Function::New(env, aim));
+  //exports.Set(Napi::String::New(env, "aim"), Napi::Function::New(env, Aim));
   return exports;
 }
 

@@ -33,6 +33,7 @@ body {
   padding: 14px 16px;
   text-decoration: none;
   font-size: 17px;
+  width: 25%;
 }
 
 .navbar a:hover {
@@ -85,7 +86,7 @@ input[type="checkbox"]:checked + label span {
 form.tagbox input[type=text] {
   padding: 10px;
   font-size: 17px;
-  border: 1px solid black;
+  border: 1px solid #191b1c;
   float: left;
   width: 80%;
   background: #f1f1f1;
@@ -103,7 +104,7 @@ form.tagbox button {
   margin-top: 1px;
   color: white;
   font-size: 17px;
-  border: 1px solid grey;
+  border: 1px solid #7289DA;
   border-left: none;
   cursor: pointer;
 }

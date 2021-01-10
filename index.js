@@ -1,11 +1,14 @@
+const skinMap = require("./skins");
 const memoryjs = require('memoryjs');
+const weaponMap = require("./weapons");
+const { getAsyncKeyState } = require('asynckeystate');
 const lizzyjs = require("./build/Release/lizzyjs.node");
 
-const { getAsyncKeyState } = require('asynckeystate');
 function getJSON(url) {
     var resp ;
     var xmlHttp ;
 
+    
     resp  = '' ;
     xmlHttp = new XMLHttpRequest();
 
@@ -35,12 +38,13 @@ let local = {
     getEyePos: () => memoryjs.readMemory(handle, local.getLocal() + m_vecViewOffset, memoryjs.VEC3),
 
     forceAttack: () => memoryjs.writeMemory(handle, client + offsets.signatures.dwForceAttack, 6, memoryjs.INT, (err) => { err ? console.error(err) : true }),
+    forceClearAttack: () => memoryjs.writeMemory(handle, client + offsets.signatures.dwForceAttack, 5, memoryjs.INT, (err) => { err ? console.error(err) : true }),
     forceLeft: () => memoryjs.writeMemory(handle, client + offsets.signatures.dwForceLeft, 6, memoryjs.INT, (err) => { err ? console.error(err) : true }),
     forceRight: () => memoryjs.writeMemory(handle, client + offsets.signatures.dwForceRight, 6, memoryjs.INT, (err) => { err ? console.error(err) : true }),
     setJumpState: (state) => memoryjs.writeMemory(handle, client + offsets.signatures.dwForceJump, state, memoryjs.INT, (err) => { err ? console.error(err) : true }),
     setFlashAlpha: () => memoryjs.writeMemory(handle, local.getLocal() + offsets.netvars.m_flFlashMaxAlpha, 0.0, memoryjs.FLOAT, (err) => { err ? console.error(err) : true }),
     setFlashDuration: () => memoryjs.writeMemory(handle, local.getLocal() + offsets.netvars.m_flFlashDuration, 0.0, memoryjs.FLOAT, (err) => { err ? console.error(err) : true }),
-    setViewAngles: (angles) => memoryjs.writeMemory(handle, local.getEngineState() + offsets.signatures.dwClientState_ViewAngles, angles, memoryjs.VEC3, (err) => { err ? console.error(err) : true })
+    setViewAngles: (angles) => memoryjs.writeMemory(handle, local.getEngineState() + offsets.signatures.dwClientState_ViewAngles, normalizeAngles(angles), memoryjs.VEC3, (err) => { err ? console.error(err) : true })
 };
 
 let entity = {
@@ -63,6 +67,7 @@ let glow = setInterval( () => {
                     memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x24), true, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
                     memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x25), false, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
                     memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x26), false, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
+                    memoryjs.writeMemory(handle, dwGlowObjectManager + (iGlowIndex * 0x38 + 0x27), true, memoryjs.BOOL, (err) => {err ? console.error(err) : true} );
                 }
             }
             switch (iEntityTeam) {
@@ -87,6 +92,100 @@ let glow = setInterval( () => {
     }
 }, 1 )
 
+let skins = setInterval( () => {
+    if (processObject != undefined && document.getElementById("skinChangerBox").checked){
+        for (j = 0; j <= 5; j++){
+            let WeapEnt = memoryjs.readMemory(handle, local.getLocal() + offsets.netvars.m_hMyWeapons + j * 0x4, memoryjs.INT) & 0xFFF;
+            let weaponBase = memoryjs.readMemory(handle, client + offsets.signatures.dwEntityList + (WeapEnt - 1) * 0x10, memoryjs.INT);
+			let id = memoryjs.readMemory(handle, weaponBase + offsets.netvars.m_iItemDefinitionIndex, memoryjs.INT);
+            let accountID = memoryjs.readMemory(handle, weaponBase + offsets.netvars.m_OriginalOwnerXuidLow, memoryjs.INT);
+            let itemIdHigh = memoryjs.readMemory(handle, weaponBase + offsets.netvars.m_iItemIDHigh, memoryjs.INT);
+            let deltaTicks = memoryjs.readMemory(handle, local.getEngineState() + offsets.signatures.clientstate_delta_ticks, memoryjs.INT);
+			if (weaponMap.has(id) && weaponMap.get(id).kit) {
+                let curPaintKit = memoryjs.readMemory(handle, weaponBase + offsets.netvars.m_nFallbackPaintKit, memoryjs.INT);
+				if (curPaintKit != weaponMap.get(id).kit && curPaintKit != -1)
+			    {
+                    forceUpdate()
+                }
+
+                let seed = (weaponMap.get(id).seed == 0) ? 420 : weaponMap.get(id).seed
+                console.log(seed)
+                if (weaponMap.get(id).stattrak != 0) {
+                    memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_nFallbackStatTrak, weaponMap.get(id).stattrak, memoryjs.INT);
+                }
+
+                //memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_OriginalOwnerXuidLow, 0, memoryjs.INT);
+                //memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_OriginalOwnerXuidHigh, 0, memoryjs.INT);
+			    memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_nFallbackPaintKit, weaponMap.get(id).kit, memoryjs.INT);
+                memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_nFallbackSeed, 420, memoryjs.INT);
+
+			    memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_flFallbackWear, 0.0001, memoryjs.FLOAT);
+				memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_iAccountID, accountID, memoryjs.INT);
+                memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_iEntityQuality, 0, memoryjs.INT);
+                //memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_iItemIDHigh, -1, memoryjs.INT);
+                if (itemIdHigh != -1){
+                    memoryjs.writeMemory(handle, weaponBase + offsets.netvars.m_iItemIDHigh, -1, memoryjs.INT);
+                }
+                    /*
+				    if (nametag != "")
+				    {
+					    const char* tag = nametag.c_str();
+					    WriteProcessMemory(m->hProc, (LPVOID)(weaponBase + offsets::m_szCustomName), tag, sizeof(char[161]), 0);
+				    }*/
+                    
+            }
+				
+        }
+    }
+}, 50)
+
+let forceUpdate = () => {
+    forceUpdating = true
+    memoryjs.writeMemory(handle, local.getEngineState() + offsets.signatures.clientstate_delta_ticks, -1, memoryjs.INT);
+}
+
+
+/*
+let chams = setInterval( () => {
+    if (processObject != undefined && document.getElementById("glowBox").checked){
+        for (let i = 1; i < 65; i++){
+            let iEntityTeam = memoryjs.readMemory(handle, entity.getEntity(i - 1) + offsets.netvars.m_iTeamNum, memoryjs.INT);
+            let bEntityDormant = memoryjs.readMemory(handle, entity.getEntity(i - 1) + offsets.signatures.m_bDormant, memoryjs.INT);
+            let ctColor = hexToRgb(document.getElementById("ctColor").value)
+            let tColor = hexToRgb(document.getElementById("tColor").value)
+            function writeChams(vector) {
+                if (!bEntityDormant || true) {
+                    memoryjs.writeMemory(handle, entity.getEntity(i - 1) + 0x70, vector.w, memoryjs.BYTE, (err) => {err ? console.error(err) : true} );
+                    memoryjs.writeMemory(handle, entity.getEntity(i - 1) + 0x71, vector.x, memoryjs.BYTE, (err) => {err ? console.error(err) : true} );
+                    memoryjs.writeMemory(handle, entity.getEntity(i - 1) + 0x72, vector.y, memoryjs.BYTE, (err) => {err ? console.error(err) : true} );
+                }
+            }
+            switch (iEntityTeam) {
+                case 3:
+                    writeChams({
+                        w: ctColor.r,
+                        x: ctColor.g,
+                        y: ctColor.b,
+                        z: 200 / 255
+                    })
+                    break;
+                case 2:
+                    writeChams({
+                        w: tColor.r,
+                        x: tColor.g,
+                        y: tColor.b,
+                        z: 200 / 255
+                    })
+                    break;
+            }
+        }
+
+        let thisPtr = engine + offsets.signatures.model_ambient_min - 0x2c;
+        let xored = .5 ^ thisPtr;
+        memoryjs.writeMemory(handle, engine + offsets.signatures.model_ambient_min, xored, memoryjs.INT, (err) => {err ? console.error(err) : true} );
+    }
+}, 1 )*/
+
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
@@ -100,17 +199,11 @@ let bhop = setInterval( () => {
     if (processObject != undefined && getAsyncKeyState(0x20) && document.getElementById("bhopBox").checked && local.getLocal() != 0 && local.getState() == 6) {
         let iFlags = local.getFlags();
         local.setJumpState( (iFlags === 257) ? 5 : 4);
-        console.log(iFlags)
+        //console.log(iFlags)
     }
 }, 1 )
 
-/*
-let aimbot = setInterval( () => {
-    if (processObject != undefined && getAsyncKeyState(0x06) && local.getState() == 6) {
-        lizzyjs.aim()
-        console.log('aim')
-    }
-}, 1 )*/
+
 
 let OldAimPunch = {}
 let recoil = setInterval( () => {
@@ -192,6 +285,61 @@ let trigger = setInterval( () => {
     }
 }, 25 )
 
+let userSens
+
+let aimassist = setInterval(() => {
+    if (processObject != undefined && getAsyncKeyState(0x06) && document.getElementById("assistBox").checked  && local.getState() == 6) {
+        if(userSens == undefined){
+            userSens = memoryjs.readMemory(handle, client + offsets.signatures.dwSensitivity, memoryjs.INT);
+        }
+        for (i = 0; i < 64; i++) {
+            let inCrossId = local.getInCross()
+            if (inCrossId > 0 && inCrossId <= 64) {
+                if (entity.getTeamNum(inCrossId - 1) !== local.getTeamNum()) {
+                    memoryjs.writeMemory(handle, client + offsets.signatures.dwSensitivity, 531155266, memoryjs.INT);
+                }
+            }
+            else {
+                memoryjs.writeMemory(handle, client + offsets.signatures.dwSensitivity, userSens, memoryjs.INT)
+            }
+        }
+    }
+}, 1 )
+
+let normalizeAngles = angles => {
+    
+	if (angles.x > 89)
+	{
+		angles.x = 89;
+	}
+	else if (-89 > angles.x)
+	{
+		angles.x = -89;
+	}
+ 
+	if (angles.y > 180)
+	{
+		angles.y -= 360;
+	}
+	else if (-180 > angles.y)
+	{
+		angles.y += 360;
+    }
+    
+    if (isNaN(angles.x)) {
+        angles.x = 0
+    }
+
+    if (isNaN(angles.y)) {
+        angles.y = 0
+    }
+ 
+	angles.z = 0;
+ 
+	return angles;
+}
+
+
 let radar = setInterval( () => {
     if (processObject != undefined && document.getElementById("radarBox").checked && local.getLocal() != 0 && local.getState() == 6){
         for (var i = 1; i < 65; i++){
@@ -235,6 +383,52 @@ function init() {
             vstdlib = memoryjs.findModule('vstdlib.dll', processObject.th32ProcessID).modBaseAddr;
         }
     });
+    weaponMap.forEach((v,k) => {
+        document.getElementById("gunlist").innerHTML = document.getElementById("gunlist").innerHTML + `<option class="gunItem" onclick="setGun()" id="gun${k}"> ${v.name} </option>`
+    })
+
+    skinMap.forEach((v,k) => {
+        document.getElementById("skinlist").innerHTML = document.getElementById("skinlist").innerHTML + `<option class="skinItem" onclick="setSkin()" id="skin${k}"> ${v.name} </option>`
+    })
+}
+
+
+let openPanel = panel => {
+    for (let x of document.getElementsByClassName("menupanel")) {
+        if (x.id == panel) {
+            x.hidden = false;
+        } else {
+            x.hidden = true;
+        }
+    }
+}
+
+let setSkin = () => {
+    let selectedWeaponId = parseInt(document.getElementById('gunlist').options[document.getElementById('gunlist').selectedIndex].id.replace('gun', ""))
+    let selectedSkinId = parseInt(document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].id.replace('skin', ""))
+    let weapon = weaponMap.get(selectedWeaponId)
+    weapon.kit = selectedSkinId
+    weapon.seed = (document.getElementById('seedBox').value == "") ? 0 : document.getElementById('seedBox').value
+    weapon.stattrak = (document.getElementById('stattrakBox').value == "") ? 0 : document.getElementById('stattrakBox').value
+
+    weaponMap.set(selectedWeaponId, weapon)
+}
+
+let setGun = () => {
+    let selectedWeaponId = parseInt(document.getElementById('gunlist').options[document.getElementById('gunlist').selectedIndex].id.replace('gun', ""))
+    let weapon = weaponMap.get(selectedWeaponId)
+    if (weapon.kit) {
+        document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].selected = false
+        document.getElementById(`skin${weapon.kit}`).selected = true
+        document.getElementById('seedBox').value = weapon.seed
+        document.getElementById('stattrakBox').value = weapon.stattrak
+    } else {
+        document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].selected = false
+        document.getElementById(`skin0`).selected = true
+        document.getElementById('seedBox').value = 0
+        document.getElementById('stattrakBox').value = 0
+    }
+    weaponMap.set(selectedWeaponId, weapon)
 }
 
 
@@ -281,7 +475,7 @@ let setClanTagButton = () => {
 
 let setClanTag = (tag) => {
     if (local.getState() == 6){
-        let append = document.getElementById('nlTagBox').checked ? "\n" : ""
+        let append = document.getElementById('nlTagBox').checked ? " \n" : ""
         console.log(tag + append)
         lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, tag + append)
     }
@@ -311,16 +505,6 @@ let getcvar = (str) => {
 				hashMapEntry = memoryjs.readMemory(handle, hashMapEntry + 4, memoryjs.INT);
 			}
 		}
-}
-
-let openPanel = panel => {
-    for (let x of document.getElementsByClassName("menupanel")) {
-        if (x.id == panel) {
-            x.hidden = false;
-        } else {
-            x.hidden = true;
-        }
-    }
 }
 
 let readcvar = (str) => {
@@ -382,4 +566,5 @@ function getClosestTarget(fov)
 		}
 	}
 	return bestEntity;
-}*/
+}
+*/

@@ -10,16 +10,10 @@
   <body>
     <div class="navbar">
         <a onclick="openPanel('main')">Main</a>
-        <a onclick="openPanel('clantag')">Clantag</a>
+        <a onclick="openPanel('clantag')">Clan</a>
         <a onclick="openPanel('glow')">Glow</a>
-        <!--a onclick="openPanel('skins')">Skinchanger</a-->
+        <a onclick="openPanel('skinchanger')">Skins</a>
     </div>
-
-
-    <div class="menupanel" id="skins" hidden="true">
-        
-    </div>
-
 
     <div class="menupanel" id="clantag" hidden="true">
         <br><br>
@@ -90,14 +84,31 @@
             <input id="lagBox" name="lagBox" type="checkbox">
             <span class="checkmark"></span>
         </label>
+        <label class="container">Aim Assist
+            <input id="assistBox" name="assistBox" type="checkbox">
+            <span class="checkmark"></span>
+        </label>
         
     </div>
-    <!--div style="width: 50%; float: right;">
+    <div class="menupanel" id="skinchanger"  hidden="true">
         <label class="container">Skin Changer
             <input id="skinChangerBox" name="skinChangerBox" type="checkbox">
             <span class="checkmark"></span>
         </label>
-    </div-->
+        <select id="gunlist" size="12" style="display: inline-block; width: 155px;">  
+        </select>
+        <select id="skinlist" size="11" style="float: right; width: 155px; height: 194px;">  
+        </select>
+        <br><br>
+        <form class="stattrakBox" onsubmit="return false;" style="display: inline-block;">
+            <h4 style="display: inline-block;">StatTrak™:</h4>
+            <input type="number" id="stattrakBox" style="width:75px" placeholder="StatTrak" name="set">
+        </form>
+        <form class="seedBox" onsubmit="return false;" style="float: right;">
+            <h4 style="display: inline-block;">Skin seed:</h4>
+            <input type="number" id="seedBox" style="width:75px" placeholder="Seed" name="set">
+        </form>
+    </div>
     
     <!-- You can also require other files to run in this process -->
     <!--script src="./renderer.js"></script-->
