@@ -10,50 +10,10 @@
   <body>
     <div class="navbar">
         <a onclick="openPanel('main')">Main</a>
-        <a onclick="openPanel('clantag')">Clan</a>
         <a onclick="openPanel('glow')">Glow</a>
+        <a onclick="openPanel('clantag')">Clan</a>
         <a onclick="openPanel('skinchanger')">Skins</a>
     </div>
-
-    <div class="menupanel" id="clantag" hidden="true">
-        <br><br>
-        <form class="tagbox" style="max-width:340px" onsubmit="return false;">
-            <input type="text" id="tagbox" placeholder="Clantag" name="set">
-            <button onclick="setClanTagButton()">Set</button>
-        </form>
-        <br>
-        <div>
-            <input id="staticTagBox" type="radio" name="user" value="Static">
-            <label for="staticTagBox"><span></span>Static</label>
-    
-            <input id="scrollTagBox" type="radio" name="user" value="Scroll" checked="true">
-            <label for="scrollTagBox"><span></span>Scroll</label>
-
-            <input id="buildTagBox" type="radio" name="user" value="build">
-            <label for="buildTagBox"><span></span>Build</label>
-
-            <input id="nlTagBox" type="checkbox" name="user" value="nl">
-            <label for="nlTagBox"><span></span>Add newline</label>
-        </div>
-        <h4 style="display: inline-block;">Interval:</h4>
-        <input type="number" id="tagintervalbox" value="750" min="250" style="width: 60px; "> ms
-        <br><br>
-        <p id="tagDisplay" style="text-align: center;"></p>
-    </div>
-
-
-    <div class="menupanel" id="glow" hidden="true">
-        <label class="container">Glow (flickers)
-            <input id="glowBox" name="glowBox" type="checkbox" checked="true">
-            <span class="checkmark"></span>
-        </label>
-        <h3 style="display: inline-block;">T color:</h3>
-        <input type="color" id="tColor" value="#ffa100" style="width:100px;text-align:right;">
-        <br>
-        <h3 style="display: inline-block;">CT color:</h3>
-        <input type="color" id="ctColor" value="#00a1ff" style="width:100px;text-align:right;">
-    </div>
-
 
     <div class="menupanel" id="main">
         <label class="container">Bunny Hop
@@ -92,27 +52,84 @@
             <input id="grenadeBox" name="grenadeBox" type="checkbox">
             <span class="checkmark"></span>
         </label-->
+        <div style="position: absolute; transform: translateX(-50%); left: 50%;">
+            <button class="saveconfig" onclick="saveConfig()">Save</button>
+        </div>
+        
         
     </div>
+
+    <div class="menupanel" id="clantag" hidden="true">
+        <br><br>
+        <form class="tagbox" style="max-width:340px" onsubmit="return false;">
+            <input type="text" id="tagbox" placeholder="Clantag" name="set">
+            <button onclick="setClanTagButton()">Set</button>
+        </form>
+        <br>
+        <div>
+            <input id="staticTagBox" type="radio" name="user" value="Static">
+            <label for="staticTagBox"><span></span>Static</label>
+    
+            <input id="scrollTagBox" type="radio" name="user" value="Scroll" checked="true">
+            <label for="scrollTagBox"><span></span>Scroll</label>
+
+            <input id="buildTagBox" type="radio" name="user" value="build">
+            <label for="buildTagBox"><span></span>Build</label>
+
+            <input id="nlTagBox" type="checkbox" name="user" value="nl">
+            <label for="nlTagBox"><span></span>Add newline</label>
+        </div>
+        <h4 style="display: inline-block;">Interval:</h4>
+        <input type="number" id="tagintervalbox" value="750" min="250" style="width: 60px; "> ms
+        <br><br>
+        <p id="tagDisplay" style="text-align: center;"></p>
+    </div>
+
+
+    <div class="menupanel" id="glow" hidden="true">
+        <label class="container">Glow Enable
+            <input id="glowBox" name="glowBox" type="checkbox" checked="true">
+            <span class="checkmark"></span>
+        </label>
+        <h3 style="display: inline-block;">T color:</h3>
+        <input type="color" id="tColor" value="#ffa100" style="width:100px;text-align:right;">
+        <br>
+        <h3 style="display: inline-block;">CT color:</h3>
+        <input type="color" id="ctColor" value="#00a1ff" style="width:100px;text-align:right;">
+    </div>
+
     <div class="menupanel" id="skinchanger"  hidden="true">
+
         <label class="container">Skin Changer
             <input id="skinChangerBox" name="skinChangerBox" type="checkbox">
             <span class="checkmark"></span>
             <button class="setskins" onclick="setSkin()">Set</button>
         </label>
-        <select id="gunlist" class="list" size="12" style="display: inline-block; width: 155px; background-color: #222;color: whitesmoke;border: 1px solid black;">  
-        </select>
-        <select id="skinlist" class="list" size="11" style="float: right; width: 155px; height: 194px; background-color: #222;color: whitesmoke;border: 1px solid black;">  
-        </select>
-        <br><br>
-        <form class="stattrakBox" onsubmit="return false;" style="display: inline-block;">
-            <h4 style="display: inline-block;">StatTrak™:</h4>
-            <input type="number" id="stattrakBox" style="width:75px" placeholder="StatTrak" name="set">
-        </form>
-        <form class="seedBox" onsubmit="return false;" style="float: right;">
-            <h4 style="display: inline-block;">Skin seed:</h4>
-            <input type="number" id="seedBox" style="width:75px" placeholder="Seed" name="set">
-        </form>
+
+        <div style="width: 50%;display: inline-block;">
+            <select id="gunlist" class="list" size="12" style="display: inline-block; width: 155px; background-color: #222;color: whitesmoke;border: 1px solid black;">  
+            </select>
+            <select id="skinlist" class="list" size="11" style="width: 155px; height: 194px; margin-top: 20px; background-color: #222;color: whitesmoke;border: 1px solid black;">  
+            </select>
+        </div>
+        
+        <div style="width: 50%;float:right;">
+
+            <form class="stattrakBox" onsubmit="return false;" style="float:right;">
+                <h4 style="display: inline-block;">StatTrak™:</h4>
+                <input type="number" id="stattrakBox" style="width:75px" placeholder="StatTrak">
+            </form>
+            <form class="seedBox" onsubmit="return false;" style="float:right;">
+                <h4 style="display: inline-block;">Skin seed :</h4>
+                <input type="number" id="seedBox" style="width:75px" placeholder="Seed">
+            </form>
+            <form class="kitBox" onsubmit="return false;" style="float:right;">
+                <h4 style="display: inline-block;">Paintkit :</h4>
+                <input type="number" id="kitBox" style="width:75px" placeholder="Skin ID">
+            </form>
+        
+        </div>
+        
     </div>
     
     <!-- You can also require other files to run in this process -->

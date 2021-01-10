@@ -1,3 +1,4 @@
+const fs = require("fs-extra");
 const skinMap = require("./skins");
 const memoryjs = require('memoryjs');
 const weaponMap = require("./weapons");
@@ -414,6 +415,8 @@ function init() {
         }
         
     })
+
+    loadConfig()
 }
 
 
@@ -434,6 +437,7 @@ let setSkin = () => {
     weapon.kit = selectedSkinId
     weapon.seed = (document.getElementById('seedBox').value == "") ? 0 : parseInt(document.getElementById('seedBox').value)
     weapon.stattrak = (document.getElementById('stattrakBox').value == "") ? 0 : parseInt(document.getElementById('stattrakBox').value)
+    document.getElementById('kitBox').value = weapon.kit
 
     weaponMap.set(selectedWeaponId, weapon)
 }
@@ -446,13 +450,63 @@ let setGun = () => {
         document.getElementById(`skin${weapon.kit}`).selected = true
         document.getElementById('seedBox').value = weapon.seed
         document.getElementById('stattrakBox').value = weapon.stattrak
+        document.getElementById('kitBox').value = weapon.kit
     } else {
         document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].selected = false
         document.getElementById(`skin0`).selected = true
         document.getElementById('seedBox').value = 0
         document.getElementById('stattrakBox').value = 0
+        document.getElementById('kitBox').value = 0
     }
     weaponMap.set(selectedWeaponId, weapon)
+}
+
+let saveConfig = () => {
+    let saveObject = {}
+    saveObject.bhop = document.getElementById('bhopBox').checked
+    saveObject.autostrafe = document.getElementById('autostrafeBox').checked
+    saveObject.radar = document.getElementById('radarBox').checked
+    saveObject.noFlash = document.getElementById('noFlashBox').checked
+    saveObject.trigger = document.getElementById('triggerBox').checked
+    saveObject.recoil = document.getElementById('recoilBox').checked
+    saveObject.lag = document.getElementById('lagBox').checked
+    saveObject.assist = document.getElementById('assistBox').checked
+    saveObject.glow = document.getElementById('glowBox').checked
+    saveObject.staticTag = document.getElementById('staticTagBox').checked
+    saveObject.scrollTag = document.getElementById('scrollTagBox').checked
+    saveObject.buildTag = document.getElementById('buildTagBox').checked
+    saveObject.nlTag = document.getElementById('nlTagBox').checked
+
+    saveObject.tColor = document.getElementById('tColor').value
+    saveObject.ctColor = document.getElementById('ctColor').value
+    saveObject.tag = document.getElementById('tagbox').value
+    saveObject.tagInterval = document.getElementById('tagintervalbox').value
+
+    fs.outputJson("config.json", saveObject)
+}
+
+let loadConfig = () => {
+    if (fs.pathExistsSync('config.json')) {
+        let saveObject = fs.readJsonSync('config.json')
+        document.getElementById('bhopBox').checked = saveObject.bhop
+        document.getElementById('autostrafeBox').checked = saveObject.autostrafe
+        document.getElementById('radarBox').checked = saveObject.radar
+        document.getElementById('noFlashBox').checked = saveObject.noFlash
+        document.getElementById('triggerBox').checked = saveObject.trigger
+        document.getElementById('recoilBox').checked = saveObject.recoil
+        document.getElementById('lagBox').checked = saveObject.lag
+        document.getElementById('assistBox').checked = saveObject.assist
+        document.getElementById('glowBox').checked = saveObject.glow
+        document.getElementById('staticTagBox').checked = saveObject.staticTag
+        document.getElementById('scrollTagBox').checked = saveObject.scrollTag
+        document.getElementById('buildTagBox').checked = saveObject.buildTag
+        document.getElementById('nlTagBox').checked = saveObject.nlTag
+
+        document.getElementById('tColor').value = saveObject.tColor
+        document.getElementById('ctColor').value = saveObject.ctColor
+        document.getElementById('tagbox').value = saveObject.tag
+        document.getElementById('tagintervalbox').value = saveObject.tagInterval
+    }
 }
 
 

@@ -15,7 +15,7 @@ const request = http.get("https://raw.githubusercontent.com/frk1/hazedumper/mast
 function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 400,
-    height: 530,
+    height: 585,
     //resizable: false,
     titleBarStyle: 'hidden',
     backgroundColor: "#191b1c",

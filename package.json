@@ -3,6 +3,7 @@
     "asynckeystate": "^0.0.5",
     "bezier-js": "^4.0.3",
     "electron-squirrel-startup": "^1.0.0",
+    "fs-extra": "^9.0.1",
     "iohook": "^0.7.2",
     "key-events": "^0.1.1",
     "memoryjs": "github:Rob--/memoryjs",
