@@ -280,7 +280,7 @@ let autostrafe = setInterval( () => {
 }, 1 )
 
 let trigger = setInterval( () => {
-    if (processObject != undefined && getAsyncKeyState(binds.trigger) && document.getElementById("triggerBox").checked && local.getLocal() != 0 && local.getState() == 6) {
+    if (processObject != undefined && getAsyncKeyState(binds.trigger.key) && document.getElementById("triggerBox").checked && local.getLocal() != 0 && local.getState() == 6) {
       let inCrossId = local.getInCross();
       if (inCrossId > 0 && inCrossId <= 64 && entity.getTeamNum(inCrossId - 1) !== local.getTeamNum()) {
         local.forceAttack();
@@ -291,7 +291,7 @@ let trigger = setInterval( () => {
 let userSens
 
 let aimassist = setInterval(() => {
-    if (processObject != undefined && getAsyncKeyState(0x06) && document.getElementById("assistBox").checked  && local.getState() == 6) {
+    if (processObject != undefined && getAsyncKeyState(binds.assist.key) && document.getElementById("assistBox").checked  && local.getState() == 6) {
         if(userSens == undefined){
             userSens = memoryjs.readMemory(handle, client + offsets.signatures.dwSensitivity, memoryjs.INT);
         }
@@ -380,8 +380,18 @@ let fakeLag = setInterval(() => {
     }
 }, 50)
 
-let binds = {bhop: 32, strafe: 32, trigger: 5}
+let binds = {
+    trigger: {
+        key:5,
+        name:4
+    },
+    assist: {
+        key:5,
+        name:4
+    },
+}
 let triggerBinding = false
+let assistBinding = false
 
 function init() {
     memoryjs.openProcess('csgo.exe', (e, process) => {
@@ -416,20 +426,30 @@ function init() {
     document.getElementById('kitNameBox').onkeydown = filterSkins
     document.addEventListener("keydown", e => {
         if(triggerBinding){
-            binds.trigger = e.keyCode
+            binds.trigger.key = e.keyCode
+            binds.trigger.name = e.code
             document.getElementById("triggerBind").innerHTML = e.code
             triggerBinding = false
+        } else if(assistBinding){
+            let keyInfo = getvKey(e)
+            binds.assist.key = keyInfo.vKey
+            binds.assist.name = e.code
+            document.getElementById("assistBind").innerHTML = e.code
+            assistBinding = false
         }
+
     })
     document.addEventListener("mousedown", e => {
         if(triggerBinding){
             let keyInfo = getvKey(e)
-            binds.trigger = keyInfo.vKey
+            binds.trigger.key = keyInfo.vKey
+            binds.trigger.name = `Mouse${keyInfo.name}`
             document.getElementById("triggerBind").innerHTML = `Mouse${keyInfo.name}`
             triggerBinding = false
         } else if(assistBinding){
             let keyInfo = getvKey(e)
-            binds.assist = keyInfo.vKey
+            binds.assist.key = keyInfo.vKey
+            binds.assist.name = `Mouse${keyInfo.name}`
             document.getElementById("assistBind").innerHTML = `Mouse${keyInfo.name}`
             assistBinding = false
         }
@@ -526,6 +546,14 @@ let loadSkins = skinSaveArray  => {
     })
 }
 
+let loadBinds = bindSave  => {
+    document.getElementById("triggerBind").innerHTML = `${bindSave.trigger.name}`
+    binds.trigger.key = bindSave.trigger.key
+
+    document.getElementById("assistBind").innerHTML = `${bindSave.assist.name}`
+    binds.assist.key = bindSave.assist.key
+}
+
 
 let filterSkins = e => {
     let search = document.getElementById('kitNameBox').value.toLocaleLowerCase()
@@ -566,6 +594,7 @@ let saveConfig = () => {
     saveObject.tag = document.getElementById('tagbox').value
     saveObject.tagInterval = document.getElementById('tagintervalbox').value
     saveObject.skins = saveSkins()
+    saveObject.binds = binds
 
     fs.outputJson("config.json", saveObject)
 }
@@ -591,6 +620,7 @@ let loadConfig = () => {
         document.getElementById('ctColor').value = saveObject.ctColor
         document.getElementById('tagbox').value = saveObject.tag
         document.getElementById('tagintervalbox').value = saveObject.tagInterval
+        loadBinds(saveObject.binds)
         loadSkins(saveObject.skins)
     } else {
         let saveObject = fs.readJsonSync('config_default.json')
@@ -612,6 +642,7 @@ let loadConfig = () => {
         document.getElementById('ctColor').value = saveObject.ctColor
         document.getElementById('tagbox').value = saveObject.tag
         document.getElementById('tagintervalbox').value = saveObject.tagInterval
+        loadBinds(saveObject.binds)
         loadSkins(saveObject.skins)
     }
 }
