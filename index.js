@@ -409,6 +409,7 @@ function init() {
     })
 
     loadConfig()
+    document.getElementById('kitNameBox').onkeydown = filterSkins
 }
 
 
@@ -456,9 +457,18 @@ let setGun = () => {
     weaponMap.set(selectedWeaponId, weapon)
 }
 
-let filterSkins = () => {
+
+let filterSkins = e => {
+    let search = document.getElementById('kitNameBox').value.toLocaleLowerCase()
+
+    if ( ( e.code.startsWith('Key') || e.code.startsWith('Digit') || e.code.startsWith('Numpad') ) && e.code != "NumpadEnter"){
+        search += e.key
+    } else if (e.code == "Backspace") {
+        search = search.slice(0, -1)
+    }
+
     for (let x of document.getElementsByClassName("skinItem")) {
-        if (x.innerHTML.trim().toLocaleLowerCase().startsWith(document.getElementById('kitNameBox').value.toLocaleLowerCase())) {
+        if (x.innerHTML.trim().toLocaleLowerCase().startsWith(search)) {
             x.hidden = false;
         } else {
             x.hidden = true;
