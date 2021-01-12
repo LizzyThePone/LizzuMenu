@@ -79,6 +79,11 @@
             <input id="nlTagBox" type="checkbox" name="user" value="nl">
             <label for="nlTagBox"><span></span>Add newline</label>
         </div>
+        <br>
+        <!--div>
+            <input id="gamesenseTagBox" type="radio" name="user" value="Static">
+            <label for="gamesenseTagBox"><span></span>gamesense</label>
+        </div-->
         <h4 style="display: inline-block;">Interval:</h4>
         <input type="number" id="tagintervalbox" value="750" min="250" style="width: 60px; "> ms
         <br><br>
@@ -124,8 +129,12 @@
                 <input type="number" id="seedBox" style="width:75px" placeholder="Seed">
             </form>
             <form class="kitBox" onsubmit="return false;" style="float:right;">
-                <h4 style="display: inline-block;">Paintkit :</h4>
+                <h4 style="display: inline-block;">Paintkit ID:</h4>
                 <input type="number" id="kitBox" style="width:75px" placeholder="Skin ID">
+            </form>
+            <form class="kitNameBox" onsubmit="return false;" style="text-align: center;">
+                <h4 style="display: inline-block;">Paintkit Name:</h4>
+                <input type="text" id="kitNameBox" style="width:175px" onkeydown="filterSkins()" placeholder="Skin Name">
             </form>
         
         </div>

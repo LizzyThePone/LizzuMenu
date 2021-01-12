@@ -4,6 +4,7 @@ const memoryjs = require('memoryjs');
 const weaponMap = require("./weapons");
 const { getAsyncKeyState } = require('asynckeystate');
 const lizzyjs = require("./build/Release/lizzyjs.node");
+const { T_STRING } = require("memoryjs");
 
 function getJSON(url) {
     var resp ;
@@ -438,6 +439,7 @@ let setSkin = () => {
     weapon.seed = (document.getElementById('seedBox').value == "") ? 0 : parseInt(document.getElementById('seedBox').value)
     weapon.stattrak = (document.getElementById('stattrakBox').value == "") ? 0 : parseInt(document.getElementById('stattrakBox').value)
     document.getElementById('kitBox').value = weapon.kit
+    document.getElementById('kitNameBox').value = document.getElementById(`skin${weapon.kit}`).innerHTML.trim()
 
     weaponMap.set(selectedWeaponId, weapon)
 }
@@ -451,14 +453,26 @@ let setGun = () => {
         document.getElementById('seedBox').value = weapon.seed
         document.getElementById('stattrakBox').value = weapon.stattrak
         document.getElementById('kitBox').value = weapon.kit
+        document.getElementById('kitNameBox').value = document.getElementById(`skin${weapon.kit}`).innerHTML.trim()
     } else {
         document.getElementById('skinlist').options[document.getElementById('skinlist').selectedIndex].selected = false
         document.getElementById(`skin0`).selected = true
         document.getElementById('seedBox').value = 0
         document.getElementById('stattrakBox').value = 0
         document.getElementById('kitBox').value = 0
+        document.getElementById('kitNameBox').value = document.getElementById(`skin0`).innerHTML.trim()
     }
     weaponMap.set(selectedWeaponId, weapon)
+}
+
+let filterSkins = () => {
+    for (let x of document.getElementsByClassName("skinItem")) {
+        if (x.innerHTML.trim().toLocaleLowerCase().startsWith(document.getElementById('kitNameBox').value.toLocaleLowerCase())) {
+            x.hidden = false;
+        } else {
+            x.hidden = true;
+        }
+    }
 }
 
 let saveConfig = () => {
@@ -522,7 +536,7 @@ let setClanTagButton = () => {
     if (document.getElementById('staticTagBox').checked){
         setClanTag(document.getElementById('tagbox').value)
     } 
-    if (document.getElementById('scrollTagBox').checked || document.getElementById('buildTagBox').checked){
+    if (document.getElementById('scrollTagBox').checked || document.getElementById('buildTagBox').checked || document.getElementById('gamesenseTagBox').checked){
         let originalTag = unescape(document.getElementById('tagbox').value)
         let currentTag = originalTag
         let direction = true
@@ -545,6 +559,41 @@ let setClanTagButton = () => {
                     direction = !direction
                 }
                 tagTimeout = setTimeout(tag, document.getElementById('tagintervalbox').value)
+            }
+            if (document.getElementById('gamesenseTagBox').checked){
+                let curtime = memoryjs.readMemory(handle, local.getEngineState() + offsets.signatures.clientstate_delta_ticks, memoryjs.INT)
+                console.log(curtime)
+                switch ((curtime * 2.4) % 27)
+				{
+				case 0: setClanTag( "                   "); break;
+				case 1: setClanTag( "                 g "); break;
+				case 2: setClanTag( "                ga "); break;
+				case 3: setClanTag( "               gam "); break;
+				case 4: setClanTag( "              game "); break;
+				case 5: setClanTag( "             games "); break;
+				case 6: setClanTag( "            gamese "); break;
+				case 7: setClanTag( "           gamesen "); break;
+				case 8: setClanTag( "          gamesens "); break;
+				case 9: setClanTag( "         gamesense "); break;
+				case 10:setClanTag( "        gamesense  "); break;
+				case 11:setClanTag( "       gamesense   "); break;
+				case 12:setClanTag( "      gamesense    "); break;
+				case 13:setClanTag( "     gamesense     "); break;
+				case 14:setClanTag( "    gamesense      "); break;
+				case 15:setClanTag( "   gamesense       "); break;
+				case 16:setClanTag( "  gamesense        "); break;
+				case 17:setClanTag( " gamesense         "); break;
+				case 18:setClanTag( "gamesense          "); break;
+				case 19:setClanTag( "amesense           "); break;
+				case 20:setClanTag( "mesense            "); break;
+				case 22:setClanTag( "esense             "); break;
+				case 23:setClanTag( "sense              "); break;
+				case 24:setClanTag( "ense               "); break;
+				case 25:setClanTag( "nse                "); break;
+				case 26:setClanTag( "se                 "); break;
+				case 27:setClanTag( "e                  "); break;
+				}
+                tagTimeout = setTimeout(tag, 1)
             }
         }
         tag()
@@ -607,28 +656,19 @@ let ragdoll = setInterval( () => {
     }
 }, 1)*/
 
-let clientCMD = () => {
-    const signature = "55 8B EC A1 ? ? ? ? 33 C9 8B 55 08";
+
+let Offset = () => {
+    const signature = '8D 34 85 ? ? ? ? 89 15 ? ? ? ? 8B 41 08 8B 48 04 83 F9 FF';
     const signatureTypes = memoryjs.READ | memoryjs.SUBTRACT;
     const patternOffset = 0x1;
-    const addressOffset = 0x0;
-    const clientCMDPointer = memoryjs.findPattern(handle, "engine.dll", signature, signatureTypes, patternOffset, addressOffset);
-    return clientCMDPointer;
-}
-
-
-
-let grenadeOffset = () => {
-    const signature = "a1 ? ? ? ? ff 0d ? ? ? ? ff 0d";
-    const signatureTypes = memoryjs.READ | memoryjs.SUBTRACT;
-    const patternOffset = 0x1;
-    const addressOffset = 48;
-    const clientCMDPointer = memoryjs.findPattern(handle, "engine.dll", signature, signatureTypes, patternOffset, addressOffset);
-    return clientCMDPointer;
+    const addressOffset = 0x10;
+    const dwLocalPlayer = memoryjs.findPattern(handle, "client.dll", signature, signatureTypes, patternOffset, addressOffset);
+    console.log(`value of dwLocalPlayer: 0x${dwLocalPlayer.toString(16)}`);
 }
 
 let consoleCMD = command => {
-    lizzyjs.console(handle, clientCMD(), command)
+    const clientCMD = lizzyjs.engineScan("55 8B EC 8B 0D ? ? ? ? 81 F9 ? ? ? ? 75 0C A1 ? ? ? ? 35 ? ? ? ? EB 05 8B 01 FF 50 34 50", 0x1, 0x0) // Custom 
+    lizzyjs.console(handle, memoryjs.findModule('engine.dll', processObject.th32ProcessID).modBaseSize + clientCMD, command)  // C++ function "Console()"
 }
 
 function getClosest() {
@@ -642,6 +682,3 @@ function getClosest() {
     }
     
 }
-
-
-
