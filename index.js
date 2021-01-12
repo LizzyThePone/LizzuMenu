@@ -22,7 +22,9 @@ function getJSON(url) {
 
     return JSON.parse(resp) ;
 }
-const offsets = getJSON("https://raw.githubusercontent.com/frk1/hazedumper/master/csgo.json");
+//const offsets = getJSON("https://raw.githubusercontent.com/frk1/hazedumper/master/csgo.json");
+const offsets = fs.readJSONSync('offsets.json')
+
 
 let processObject, handle, client, engine, vstdlib, currentTag;
 let local = {
@@ -230,22 +232,10 @@ let recoil = setInterval( () => {
             NewViewAngles.x = ((CurrentViewAngles.x + OldAimPunch.x) - (vPunch.x * 2));
             NewViewAngles.y = ((CurrentViewAngles.y + OldAimPunch.y) - (vPunch.y * 2));
 
-            while (NewViewAngles.y > 180)
-                NewViewAngles.y -= 360;
-
-            while (NewViewAngles.y < -180)
-                NewViewAngles.y += 360;
-
-            if (NewViewAngles.x > 89.0)
-                NewViewAngles.x = 89.0;
-
-            if (NewViewAngles.x < -89.0)
-                NewViewAngles.x = -89.0;
-
             OldAimPunch.x = vPunch.x * 2;
             OldAimPunch.y = vPunch.y * 2;
 
-            local.setViewAngles(NewViewAngles)
+            local.setViewAngles(normalizeAngles(NewViewAngles))
 
         }
         else
@@ -402,6 +392,7 @@ function init() {
             client = memoryjs.findModule('client.dll', processObject.th32ProcessID).modBaseAddr;
             engine = memoryjs.findModule('engine.dll', processObject.th32ProcessID).modBaseAddr;
             vstdlib = memoryjs.findModule('vstdlib.dll', processObject.th32ProcessID).modBaseAddr;
+            scanPatterns();
         }
     });
     weaponMap.forEach((v,k) => {
@@ -657,13 +648,18 @@ let ragdoll = setInterval( () => {
 }, 1)*/
 
 
-let Offset = () => {
-    const signature = '8D 34 85 ? ? ? ? 89 15 ? ? ? ? 8B 41 08 8B 48 04 83 F9 FF';
-    const signatureTypes = memoryjs.READ | memoryjs.SUBTRACT;
-    const patternOffset = 0x1;
-    const addressOffset = 0x10;
-    const dwLocalPlayer = memoryjs.findPattern(handle, "client.dll", signature, signatureTypes, patternOffset, addressOffset);
-    console.log(`value of dwLocalPlayer: 0x${dwLocalPlayer.toString(16)}`);
+let scanPatterns = async () => {/*
+    offsets.signatures.dwClientState = await lizzyjs.engineScan("A1 ? ? ? ? 33 D2 6A 00 6A 00 33 C9 89 B0", 0x1, 0x0)
+    offsets.signatures.dwLocalPlayer = await lizzyjs.clientScan("8D 34 85 ? ? ? ? 89 15 ? ? ? ? 8B 41 08 8B 48 04 83 F9 FF", 0x1, 0x10)
+    offsets.signatures.dwSetClanTag = await lizzyjs.engineScan("A1 ? ? ? ? 8B 0C B0 8B 01 FF 50 ? 46 3B 35 ? ? ? ? 7C EA 8B 0D", 0x0, 0x0)
+    offsets.signatures.dwbSendPackets = await lizzyjs.engineScan("B3 01 8B 01 8B 40 10 FF D0 84 C0 74 0F 80 BF ? ? ? ? ? 0F 84", 0x0, 0x0)
+    offsets.signatures.dwGlowObjectManager = await lizzyjs.clientScan("8D 34 85 ? ? ? ? 89 15 ? ? ? ? 8B 41 08 8B 48 04 83 F9 FF", 0x1, 0x4)
+    //offsets.signatures.dwSensitivity = await lizzyjs.clientScan("81 F9 ? ? ? ? 75 1D F3 0F 10 05 ? ? ? ? F3 0F 11 44 24 ? 8B 44 24 0C 35 ? ? ? ? 89 44 24 0C", 0x1, 44)
+    offsets.signatures.dwForceLeft = await lizzyjs.clientScan("55 8B EC 51 53 8A 5D 08", 0x0, 465)
+    offsets.signatures.dwForceRight = await lizzyjs.clientScan("55 8B EC 51 53 8A 5D 08", 0x0, 512)
+    offsets.signatures.dwForceJump = await lizzyjs.clientScan("8B 0D ? ? ? ? 8B D6 8B C1 83 CA 02", 0x0, 0x2)
+    offsets.signatures.dwForceAttack = await lizzyjs.clientScan("89 0D ? ? ? ? 8B 0D ? ? ? ? 8B F2 8B C1 83 CE 04", 0x0, 0x2)
+    offsets.signatures.dwEntityList = await lizzyjs.clientScan("BB ? ? ? ? 83 FF 01 0F 8C ? ? ? ? 3B F8", 0x0, 0x1)*/
 }
 
 let consoleCMD = command => {
