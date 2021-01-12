@@ -423,34 +423,45 @@ function init() {
     })
     document.addEventListener("mousedown", e => {
         if(triggerBinding){
-            let vKey, name;
-            switch (e.button){
-                case 0:
-                    vKey = 0x01
-                    name = 1
-                    break;
-                case 1:
-                    vKey = 0x04
-                    name = 3
-                    break;
-                case 2:
-                    vKey = 0x02
-                    name = 2
-                    break;
-                case 3:
-                    vKey = 0x05
-                    name = 5
-                    break;
-                case 4:
-                    vKey = 0x06
-                    name = 4
-                    break;
-            }
-            binds.trigger = e.button + 2
-            document.getElementById("triggerBind").innerHTML = `Mouse${name}`
+            let keyInfo = getvKey(e)
+            binds.trigger = keyInfo.vKey
+            document.getElementById("triggerBind").innerHTML = `Mouse${keyInfo.name}`
             triggerBinding = false
+        } else if(assistBinding){
+            let keyInfo = getvKey(e)
+            binds.assist = keyInfo.vKey
+            document.getElementById("assistBind").innerHTML = `Mouse${keyInfo.name}`
+            assistBinding = false
         }
     })
+}
+
+let getvKey = e => {
+    let vKey, name;
+    switch (e.button){
+        case 0:
+            vKey = 0x01
+            name = 1
+            break;
+        case 1:
+            vKey = 0x04
+            name = 3
+            break;
+        case 2:
+            vKey = 0x02
+            name = 2
+            break;
+        case 3:
+            vKey = 0x05
+            name = 5
+            break;
+        case 4:
+            vKey = 0x06
+            name = 4
+            break;
+    }
+    return {vKey, name}
+
 }
 
 
