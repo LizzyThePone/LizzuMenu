@@ -97,6 +97,7 @@ let glow = setInterval( () => {
 
 let queueUpdate = false
 
+
 let skins = setInterval( () => {
     if (processObject != undefined && document.getElementById("skinChangerBox").checked){
         for (j = 0; j <= 5; j++){
@@ -279,7 +280,7 @@ let autostrafe = setInterval( () => {
 }, 1 )
 
 let trigger = setInterval( () => {
-    if (processObject != undefined && getAsyncKeyState(0x06) && document.getElementById("triggerBox").checked && local.getLocal() != 0 && local.getState() == 6) {
+    if (processObject != undefined && getAsyncKeyState(binds.trigger) && document.getElementById("triggerBox").checked && local.getLocal() != 0 && local.getState() == 6) {
       let inCrossId = local.getInCross();
       if (inCrossId > 0 && inCrossId <= 64 && entity.getTeamNum(inCrossId - 1) !== local.getTeamNum()) {
         local.forceAttack();
@@ -379,6 +380,9 @@ let fakeLag = setInterval(() => {
     }
 }, 50)
 
+let binds = {bhop: 32, strafe: 32, trigger: 5}
+let triggerBinding = false
+
 function init() {
     memoryjs.openProcess('csgo.exe', (e, process) => {
         if (e) {
@@ -410,6 +414,43 @@ function init() {
 
     loadConfig()
     document.getElementById('kitNameBox').onkeydown = filterSkins
+    document.addEventListener("keydown", e => {
+        if(triggerBinding){
+            binds.trigger = e.keyCode
+            document.getElementById("triggerBind").innerHTML = e.code
+            triggerBinding = false
+        }
+    })
+    document.addEventListener("mousedown", e => {
+        if(triggerBinding){
+            let vKey, name;
+            switch (e.button){
+                case 0:
+                    vKey = 0x01
+                    name = 1
+                    break;
+                case 1:
+                    vKey = 0x04
+                    name = 3
+                    break;
+                case 2:
+                    vKey = 0x02
+                    name = 2
+                    break;
+                case 3:
+                    vKey = 0x05
+                    name = 5
+                    break;
+                case 4:
+                    vKey = 0x06
+                    name = 4
+                    break;
+            }
+            binds.trigger = e.button + 2
+            document.getElementById("triggerBind").innerHTML = `Mouse${name}`
+            triggerBinding = false
+        }
+    })
 }
 
 
@@ -457,6 +498,23 @@ let setGun = () => {
     weaponMap.set(selectedWeaponId, weapon)
 }
 
+let saveSkins = () => {
+    let skinSaveArray = []
+    weaponMap.forEach((v,k) => {
+        if (v.kit){
+            skinSaveArray.push({id:k,skin:v})
+        }
+    })
+
+    return skinSaveArray
+}
+
+let loadSkins = skinSaveArray  => {
+    skinSaveArray.forEach((v,k) => {
+        weaponMap.set(v.id, v.skin)
+    })
+}
+
 
 let filterSkins = e => {
     let search = document.getElementById('kitNameBox').value.toLocaleLowerCase()
@@ -468,7 +526,7 @@ let filterSkins = e => {
     }
 
     for (let x of document.getElementsByClassName("skinItem")) {
-        if (x.innerHTML.trim().toLocaleLowerCase().startsWith(search)) {
+        if (x.innerHTML.trim().toLocaleLowerCase().includes(search)) {
             x.hidden = false;
         } else {
             x.hidden = true;
@@ -496,6 +554,7 @@ let saveConfig = () => {
     saveObject.ctColor = document.getElementById('ctColor').value
     saveObject.tag = document.getElementById('tagbox').value
     saveObject.tagInterval = document.getElementById('tagintervalbox').value
+    saveObject.skins = saveSkins()
 
     fs.outputJson("config.json", saveObject)
 }
@@ -521,6 +580,28 @@ let loadConfig = () => {
         document.getElementById('ctColor').value = saveObject.ctColor
         document.getElementById('tagbox').value = saveObject.tag
         document.getElementById('tagintervalbox').value = saveObject.tagInterval
+        loadSkins(saveObject.skins)
+    } else {
+        let saveObject = fs.readJsonSync('config_default.json')
+        document.getElementById('bhopBox').checked = saveObject.bhop
+        document.getElementById('autostrafeBox').checked = saveObject.autostrafe
+        document.getElementById('radarBox').checked = saveObject.radar
+        document.getElementById('noFlashBox').checked = saveObject.noFlash
+        document.getElementById('triggerBox').checked = saveObject.trigger
+        document.getElementById('recoilBox').checked = saveObject.recoil
+        document.getElementById('lagBox').checked = saveObject.lag
+        document.getElementById('assistBox').checked = saveObject.assist
+        document.getElementById('glowBox').checked = saveObject.glow
+        document.getElementById('staticTagBox').checked = saveObject.staticTag
+        document.getElementById('scrollTagBox').checked = saveObject.scrollTag
+        document.getElementById('buildTagBox').checked = saveObject.buildTag
+        document.getElementById('nlTagBox').checked = saveObject.nlTag
+
+        document.getElementById('tColor').value = saveObject.tColor
+        document.getElementById('ctColor').value = saveObject.ctColor
+        document.getElementById('tagbox').value = saveObject.tag
+        document.getElementById('tagintervalbox').value = saveObject.tagInterval
+        loadSkins(saveObject.skins)
     }
 }
 
@@ -562,50 +643,52 @@ let setClanTagButton = () => {
                 tagTimeout = setTimeout(tag, document.getElementById('tagintervalbox').value)
             }
             if (document.getElementById('gamesenseTagBox').checked){
-                let curtime = memoryjs.readMemory(handle, local.getEngineState() + offsets.signatures.clientstate_delta_ticks, memoryjs.INT)
-                console.log(curtime)
-                switch ((curtime * 2.4) % 27)
+                let curtime = lizzyjs.getCurtime(handle, engine + offsets.signatures.dwGlobalVars)
+                switch ((Math.floor(curtime * 2.4) % 26))
 				{
-				case 0: setClanTag( "                   "); break;
-				case 1: setClanTag( "                 g "); break;
-				case 2: setClanTag( "                ga "); break;
-				case 3: setClanTag( "               gam "); break;
-				case 4: setClanTag( "              game "); break;
-				case 5: setClanTag( "             games "); break;
-				case 6: setClanTag( "            gamese "); break;
-				case 7: setClanTag( "           gamesen "); break;
-				case 8: setClanTag( "          gamesens "); break;
-				case 9: setClanTag( "         gamesense "); break;
-				case 10:setClanTag( "        gamesense  "); break;
-				case 11:setClanTag( "       gamesense   "); break;
-				case 12:setClanTag( "      gamesense    "); break;
-				case 13:setClanTag( "     gamesense     "); break;
-				case 14:setClanTag( "    gamesense      "); break;
-				case 15:setClanTag( "   gamesense       "); break;
-				case 16:setClanTag( "  gamesense        "); break;
-				case 17:setClanTag( " gamesense         "); break;
-				case 18:setClanTag( "gamesense          "); break;
-				case 19:setClanTag( "amesense           "); break;
-				case 20:setClanTag( "mesense            "); break;
-				case 22:setClanTag( "esense             "); break;
-				case 23:setClanTag( "sense              "); break;
-				case 24:setClanTag( "ense               "); break;
-				case 25:setClanTag( "nse                "); break;
-				case 26:setClanTag( "se                 "); break;
-				case 27:setClanTag( "e                  "); break;
+                case 0: setClanTag( ""); break;
+				case 1: setClanTag( "g"); break;
+				case 2: setClanTag( "ga"); break;
+				case 3: setClanTag( "gam"); break;
+				case 4: setClanTag( "game"); break;
+				case 5: setClanTag( "games"); break;
+				case 6: setClanTag( "gamese"); break;
+				case 7: setClanTag( "gamesen"); break;
+				case 8: setClanTag( "gamesens"); break;
+                case 9:setClanTag( "gamesense"); break;
+                case 10:setClanTag( "gamesense"); break;
+                case 11:setClanTag( "gamesense"); break;
+                case 12:setClanTag( "gamesense"); break;
+                case 13:setClanTag( "gamesense"); break;
+                case 14:setClanTag( "gamesense"); break;
+                case 15:setClanTag( "gamesense"); break;
+                case 16:setClanTag( "gamesense"); break;
+                case 17:setClanTag( "gamesense"); break;
+                case 18:setClanTag( "gamesense"); break;
+				case 19:setClanTag( "amesense"); break;
+				case 20:setClanTag( "mesense"); break;
+				case 21:setClanTag( "esense"); break;
+				case 22:setClanTag( "sense"); break;
+				case 23:setClanTag( "ense"); break;
+				case 24:setClanTag( "nse"); break;
+				case 25:setClanTag( "se"); break;
+                case 26:setClanTag( "e"); break;
 				}
-                tagTimeout = setTimeout(tag, 1)
+                tagTimeout = setTimeout(tag, 25)
             }
         }
         tag()
     } 
 }
 
+let setTag
+
 let setClanTag = (tag) => {
-    if (local.getState() == 6){
+    if (local.getState() == 6 && tag != setTag){
         let append = document.getElementById('nlTagBox').checked ? " \n" : ""
         console.log(tag + append)
         lizzyjs.setClanTag(handle, engine + offsets.signatures.dwSetClanTag, tag + append)
+        setTag = tag
     }
     document.getElementById('tagDisplay').innerHTML = tag
 }

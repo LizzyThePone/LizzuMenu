@@ -210,6 +210,45 @@ Napi::Value EngineScan(const Napi::CallbackInfo& args) {
   	return num;
 }
 
+class CGlobalVarsBase
+{
+public:
+	float	realtime;
+	int	framecount;
+	float	absolute_frametime;
+	float	absolute_framestarttimestddev;
+	float	curtime;
+	float	frameTime;
+	int	maxClients;
+	int	tickcount;
+	float	interval_per_tick;
+	float	interpolation_amount;
+	int	simThicksThisFrame;
+	int	network_protocol;
+}pGlobals;
+
+CGlobalVarsBase* pGlobalVars( HANDLE hProcess, int address )
+{
+	ReadProcessMemory( hProcess, LPCVOID( address ), &pGlobals, sizeof( CGlobalVarsBase ), NULL );
+	return &pGlobals;
+}
+
+Napi::Value GetCurtime(const Napi::CallbackInfo& callArgs) {
+	Napi::Env env = callArgs.Env();
+
+  	if (!callArgs[0].IsNumber() && !callArgs[1].IsNumber() && !callArgs[2].IsString()) {
+    	Napi::Error::New(env, "first and second argument must be a number, third argument must be a string").ThrowAsJavaScriptException();
+    	return env.Null();
+  	}
+	
+  	HANDLE ProcessHandle = (HANDLE)callArgs[0].As<Napi::Number>().Int64Value();
+  	DWORD address = callArgs[1].As<Napi::Number>().Int64Value();
+	float curtime = pGlobalVars(ProcessHandle, address)->curtime;
+
+	Napi::Number num = Napi::Number::New(env, curtime);
+	return num;
+}
+
 #pragma pack(push,1)
 struct ClientCmd_Unrestricted_t
 {
@@ -249,12 +288,13 @@ Napi::Value Console(const Napi::CallbackInfo& callArgs) {
 }
 
 Napi::Object init(Napi::Env env, Napi::Object exports) {
-  exports.Set(Napi::String::New(env, "setClanTag"), Napi::Function::New(env, SetClanTag));
-  exports.Set(Napi::String::New(env, "console"), Napi::Function::New(env, Console));
-  exports.Set(Napi::String::New(env, "clientScan"), Napi::Function::New(env, ClientScan));
-  exports.Set(Napi::String::New(env, "engineScan"), Napi::Function::New(env, EngineScan));
-  //exports.Set(Napi::String::New(env, "aim"), Napi::Function::New(env, Aim));
-  return exports;
+  	exports.Set(Napi::String::New(env, "setClanTag"), Napi::Function::New(env, SetClanTag));
+  	exports.Set(Napi::String::New(env, "console"), Napi::Function::New(env, Console));
+  	exports.Set(Napi::String::New(env, "clientScan"), Napi::Function::New(env, ClientScan));
+  	exports.Set(Napi::String::New(env, "engineScan"), Napi::Function::New(env, EngineScan));
+	exports.Set(Napi::String::New(env, "getCurtime"), Napi::Function::New(env, GetCurtime));
+  	//exports.Set(Napi::String::New(env, "aim"), Napi::Function::New(env, Aim));
+  	return exports;
 }
 
 NODE_API_MODULE(lizzyjs, init)
