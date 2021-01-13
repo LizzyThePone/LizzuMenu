@@ -380,16 +380,7 @@ let fakeLag = setInterval(() => {
     }
 }, 50)
 
-let binds = {
-    trigger: {
-        key:5,
-        name:4
-    },
-    assist: {
-        key:5,
-        name:4
-    },
-}
+let binds = {trigger: {}, assist: {}}
 let triggerBinding = false
 let assistBinding = false
 
