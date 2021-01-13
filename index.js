@@ -446,7 +446,8 @@ function init() {
             binds.trigger.name = `Mouse${keyInfo.name}`
             document.getElementById("triggerBind").innerHTML = `Mouse${keyInfo.name}`
             triggerBinding = false
-        } else if(assistBinding){
+        }
+        if(assistBinding){
             let keyInfo = getvKey(e)
             binds.assist.key = keyInfo.vKey
             binds.assist.name = `Mouse${keyInfo.name}`
@@ -588,6 +589,7 @@ let saveConfig = () => {
     saveObject.scrollTag = document.getElementById('scrollTagBox').checked
     saveObject.buildTag = document.getElementById('buildTagBox').checked
     saveObject.nlTag = document.getElementById('nlTagBox').checked
+    saveObject.skinChanger = document.getElementById('skinChangerBox').checked
 
     saveObject.tColor = document.getElementById('tColor').value
     saveObject.ctColor = document.getElementById('ctColor').value
@@ -615,6 +617,7 @@ let loadConfig = () => {
         document.getElementById('scrollTagBox').checked = saveObject.scrollTag
         document.getElementById('buildTagBox').checked = saveObject.buildTag
         document.getElementById('nlTagBox').checked = saveObject.nlTag
+        document.getElementById('skinChangerBox').checked = saveObject.skinChanger
 
         document.getElementById('tColor').value = saveObject.tColor
         document.getElementById('ctColor').value = saveObject.ctColor
@@ -637,6 +640,7 @@ let loadConfig = () => {
         document.getElementById('scrollTagBox').checked = saveObject.scrollTag
         document.getElementById('buildTagBox').checked = saveObject.buildTag
         document.getElementById('nlTagBox').checked = saveObject.nlTag
+        document.getElementById('skinChangerBox').checked = saveObject.skinChanger
 
         document.getElementById('tColor').value = saveObject.tColor
         document.getElementById('ctColor').value = saveObject.ctColor
@@ -782,7 +786,6 @@ let ragdoll = setInterval( () => {
     }
 }, 1)*/
 
-
 let scanPatterns = async () => {/*
     offsets.signatures.dwClientState = await lizzyjs.engineScan("A1 ? ? ? ? 33 D2 6A 00 6A 00 33 C9 89 B0", 0x1, 0x0)
     offsets.signatures.dwLocalPlayer = await lizzyjs.clientScan("8D 34 85 ? ? ? ? 89 15 ? ? ? ? 8B 41 08 8B 48 04 83 F9 FF", 0x1, 0x10)
@@ -811,5 +814,4 @@ function getClosest() {
             local.forceAttack();
         }
     }
-    
 }
